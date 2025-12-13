@@ -1,0 +1,624 @@
+
+import { useState, useEffect } from 'react';
+import type { FishShopFullDto } from '../core/types/FishShop';
+import type { TemplateSchedule } from '../core/types/TemplateSchedule';
+import type { OrderItem } from '../core/types/OrderItem';
+import { useLocation } from "react-router-dom";
+import type { ProductType } from '../core/types/ProductType';
+// import type { Product } from '../core/types/Product';
+// import type { ProductLabel } from '../core/types/ProductLabel';
+ import type { ProductCategory } from '../core/types/ProducCategory';
+import { get, post } from '../core/api/axiosHttpClient';
+import { useNavigate } from "react-router-dom";
+import ProductCard from '../components/ProductCard';
+import Cart from '../components/Cart';
+import { X } from "lucide-react";
+
+import PickupLocation from '../components/PickupLocation';
+import type { Order } from '../core/types/Order';
+import { useCart } from '../components/CartContext';
+
+import { initAxiosClient } from "../core/api/axiosHttpClient";
+// import { id } from 'date-fns/locale';
+
+
+export default function CreateOrder() {
+
+    const location = useLocation();
+    const { fishShop, templateScedule } = (location.state as { fishShop: FishShopFullDto; templateScedule: TemplateSchedule }) || {};
+    // const [products, setProducts] = useState<Product[]>([]);
+    const [orderItemsProduct, setOrderItemsProduct] = useState<OrderItem[]>([]);
+    const [customerName, setCustomerName] = useState<string>('');
+    const [nameTouched, setNameTouched] = useState(false);
+    // const [submitMessage, setSubmitMessage] = useState<string>('');
+
+    const [productCategories, setProductCategories] = useState<ProductCategory[]>([]);
+    const [selectedSearchProductCategories, setSelectedSearchProductCategories] = useState<ProductCategory[]>();
+    const [selectedSearchProductTypes, setSelectedSearchProductType] = useState<ProductType[]>();
+
+    const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+
+    const [numberOfSelectedFilters, setNumberOfSelectedFilters] = useState(0);
+
+    //  const [allOrderItems, setAllOrderItems] = useState<OrderItem[]>([]);
+    // const [enteredQuantity, setEnteredQuantity] = useState<string[]>([]);
+
+    const [showFilters, setShowCFilters] = useState(true);
+
+    const [phone, setPhone] = useState<string>('');
+    const [phoneTouched, setPhoneTouched] = useState(false);
+    const [selectedMenuPoint, setSelectedMenuPoint] = useState(0);
+    const [email, setEmail] = useState<string>('');
+    const [emailTouched, setEmailTouched] = useState(false);
+
+    const [comment, setComment] = useState<string>('');  // <-- Added comment state
+    const [submitting, setSubmitting] = useState(false);
+    /* const [error, setError] = useState<string | null>(null);
+    const [reload, setReload] = useState(0);
+    const [loading, setLoading] = useState(true);
+    
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const [paymentError, setPaymentError] = useState<string | null>(null); */
+    const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+
+    const navigate = useNavigate();
+    // const { cart } = useCart();
+
+    const { cart, clearCart } = useCart();
+
+    const isNameValid = customerName.trim().length > 0;
+    const isPhoneValid = phone.trim().length > 0;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isEmailValid = emailRegex.test(email);
+    const IsAnyOrderLines = Object.values(cart).length > 0
+
+
+    const isFormValid = isNameValid && isPhoneValid && isEmailValid && IsAnyOrderLines
+
+    initAxiosClient();
+    
+
+    useEffect(() => {
+
+        const fetchProducts = async () => {
+
+            
+            try {
+
+                const categoryResponse: any = await get('/Home/productcategorylist');
+
+                setProductCategories(categoryResponse)
+
+            } catch (err) {
+
+            }
+
+            try {
+
+                const productTypeResponse: any = await get('/Home/producttypelist');
+
+                setProductTypes(productTypeResponse)
+
+            } catch (err) {
+
+            }
+
+            try {
+                const productsResponse: any = await get('/Home/productlist');
+
+                // setProducts(productsResponse);
+
+                const tmpOrderItemsProduct: OrderItem[] = productsResponse.map((product: any) => ({
+                    quantity: 1,
+                    productid: product.id,
+                    producttype: product.producttype,
+                    productnumber: product.productnumber,
+                    productname: product.name,
+                    imageurl: product.imageurl,
+                    productdescription: product.description,
+                    details: '',
+                    unitdiscountpercentage: product.discountpercentage,
+                    discountedunitprice: product.discountprice,
+                    unitprice: product.price,
+                    orderid: 0,
+                    selected: false,
+                    badge: product.badge,
+                    weight: product.weight,
+                    shelfLife: product.shelflife,
+                    pricePerKg: product.pricePerKg,
+
+                    productcategories: product.productcategories != null ? product.productcategories : [],
+
+                    producttypes: product.producttypes != null ? product.producttypes : [],
+
+                    productlabels: product.productLabels != null ? product.productLabels.map((productLabel: any) => ({
+                        id: productLabel.id,
+                        imageurl: productLabel.imageUrl,
+                        labelname: productLabel.labelName
+                    })) : []
+
+                }
+                ));
+
+
+
+                let filteredByCategory;
+                if (!selectedSearchProductCategories || selectedSearchProductCategories.length === 0) {
+                    // nothing selected → show all products
+                    filteredByCategory = tmpOrderItemsProduct;
+                } else {
+                    // filter products if any of their categories match any selected category
+                    filteredByCategory = tmpOrderItemsProduct.filter((p) =>
+                        p.productcategories?.some((cat) =>
+                            selectedSearchProductCategories.some((selectedCat) => selectedCat.id === cat.id)
+                        )
+                    );
+                }
+
+                let filteredOrderItemProducts;
+                if (!selectedSearchProductTypes || selectedSearchProductTypes.length === 0) {
+                    filteredOrderItemProducts = filteredByCategory
+                } else {
+                    // filter products if any of their categories match any selected category
+                    filteredOrderItemProducts = tmpOrderItemsProduct.filter((p) =>
+                        p.producttypes?.some((type) =>
+                            selectedSearchProductTypes.some((selectedCat) => selectedCat.id === type.id)
+                        )
+                    );
+
+
+                }
+
+                setOrderItemsProduct(filteredOrderItemProducts);
+
+                // setLoading(false);
+
+            } catch (err) {
+                // setError('Failed to load locations');
+                // setLoading(false);
+                console.error(err);
+            } finally {
+                // setLoading(false);
+            }
+        }
+        calculateNumberOgSelectedFilters();
+        fetchProducts();
+        setCustomerName('');
+        setNameTouched(false);
+        setPhone('');
+        setPhoneTouched(false);
+        setEmail('');
+        setEmailTouched(false);
+        setComment('');  // Reset comment on open
+        // setSubmitError(null);
+        setSubmitSuccess(null);
+        setSubmitting(false);
+    }, [selectedSearchProductCategories, selectedSearchProductTypes]);
+
+    /*   const toggleSelection = (index: number) => {
+          const updated = [...allOrderItems];
+          updated[index].selected = !updated[index].selected;
+          setAllOrderItems(updated);
+      };
+  
+      const updateQuantity = (index: number, quantity: string) => {
+  
+          if (quantity === '') {
+              enteredQuantity[index] = '';
+              const updated = [...allOrderItems];
+              updated[index].quantity = 0;
+              setAllOrderItems(updated);
+              return
+              return;
+              // quantityAsNumber = 0;
+          }
+  
+          let quantityAsNumber = Number(quantity);
+  
+          if (!isNaN(quantityAsNumber)) {
+              enteredQuantity[index] = quantity;
+              const updated = [...allOrderItems];
+              updated[index].quantity = quantityAsNumber;
+              setAllOrderItems(updated);
+              return
+          }
+  
+  
+      }; */
+
+
+    function calculateNumberOgSelectedFilters() {
+        let count = 0;
+        if (selectedSearchProductCategories?.length && selectedSearchProductCategories?.length > 0) {
+            count++;
+        }
+
+        if (selectedSearchProductTypes?.length && selectedSearchProductTypes?.length > 0) {
+            count++;
+        }
+
+        setNumberOfSelectedFilters(count);
+    }
+
+
+
+
+
+    function handleMenuSelection(menuItem: number) {
+        setSelectedMenuPoint(menuItem);
+        if (menuItem === 1) {
+            navigate("/home")
+        }
+    }
+
+    function categorySelectedToggle(selectedCategory: ProductCategory) {
+        setSelectedSearchProductCategories(prevCategories => {
+            // Check if category already exists
+            const exists = prevCategories?.some(category => category.id === selectedCategory.id);
+
+            if (exists) {
+                // Remove it
+                return prevCategories?.filter(category => category.id !== selectedCategory.id);
+            } else {
+                // Add it
+                return [...(prevCategories || []), selectedCategory];
+            }
+        });
+    }
+
+    function isCategorySelected(category: ProductCategory) {
+        return selectedSearchProductCategories?.some(c => c.id === category.id);
+    }
+
+    function productTypeSelectedToggle(selectedProductType: ProductType) {
+        setSelectedSearchProductType(prevProductTypes => {
+            // Check if type already exists
+            const exists = prevProductTypes?.some(productType => productType.id === selectedProductType.id);
+
+            if (exists) {
+                // Remove it
+                return prevProductTypes?.filter(productType => productType.id !== selectedProductType.id);
+            } else {
+                // Add it
+                return [...(prevProductTypes || []), selectedProductType];
+            }
+        });
+    }
+
+    function isProductTypeSelected(productType: ProductType) {
+        return selectedSearchProductTypes?.some(type => type.id === productType.id);
+    }
+
+    function handleShowFilters() {
+        if (showFilters) {
+            setShowCFilters(false)
+        }
+        else {
+            setShowCFilters(true)
+        }
+
+
+    }
+
+    const SubmitOrder = async () => {
+        setSubmitting(true);
+
+        const customerOrderCodeAsString = Math.floor(1000 + Math.random() * 9000).toString();
+        // const tmpOrderlines = Object.values(cart);
+
+        const orderData: Order = {
+            id: 0,
+            customerName: customerName.trim(),
+            customerorderCode: customerOrderCodeAsString,
+            phone: phone,
+            email: email,
+            locationId: templateScedule.locationid,
+            createddatetime: new Date().toISOString(),
+            modifieddatetime: new Date().toISOString(),
+            payeddatetime: new Date().toISOString(),
+            locationname: 'aaaa',
+            locationstartdatetime: '',
+            locationenddatetime: '',
+            locationbeautifiedstartdatetime: 'aaa',
+            locationbeautifiedTimeInterval: 'aaaa',
+            totalPrice: 0,
+            // totalPrice: parseFloat(getTotal()),
+            templateScheduleId: templateScedule.id,
+            deliveryDate: templateScedule.date,
+            fishShopId: fishShop.id,
+            comment: comment.trim(),
+            orderlines: Object.values(cart),
+            templateSchedule: templateScedule,
+            fishShop: undefined
+
+        };
+
+        try {
+
+            let response = await post('/Home/createorder', orderData);
+            if (response) { }
+
+            setSubmitSuccess("Ordren er sendt")
+
+            setTimeout(() => {
+                setSubmitSuccess(null);
+            }, 3000);
+
+            clearCart();
+
+
+        } catch (error) {
+
+            // setSubmitError('Kunne ikke sende bestillingen. Prøv igen senere.');
+            console.error(error);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+
+    return (
+        <>
+            <div className="flex flex-col gap-30  bg-customBlue text-left">
+                <div className="flex">
+                    {/* Column 1 */}
+                    <div className="flex-1  text-white p-4 text-left">
+                        <img src="/images/jjfisk_logo.svg" alt="Logo" height={100} width={100} />
+                    </div>
+
+                    {/* Column 2 with nested row */}
+                    <div className="flex-1 text-white p-4">
+                        <div className="grid grid-cols-5 gap-2 text-left">
+                            <div className="text-2xl p-2">
+                                <span
+                                    onClick={() => handleMenuSelection(1)}
+                                    className={`cursor-pointer hover:text-hoverYellow ${selectedMenuPoint == 1 ? 'text-hoverYellow' : 'text-white'}`} >
+                                    FORSIDE
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div className="flex text-left mt-10 text-2xl bg-white items-center">
+                <div className="flex-1"></div>
+
+                <div className="flex-[5] flex items-center gap-6">
+                    {/* Filter button */}
+                    <button
+                        className="flex items-center gap-2 bg-hoverYellowLight px-4 py-2 rounded hover:bg-white"
+                        onClick={() => handleShowFilters()}
+                    >
+                        <span>
+                            filtre {numberOfSelectedFilters > 0 ? `(${numberOfSelectedFilters})` : ""}
+                        </span>
+                        <img src="/images/funnel.svg" width={40} alt="funnel" />
+                    </button>
+
+                    {/* Selected categories */}
+                    {numberOfSelectedFilters > 0 && (
+                        <div className="flex flex-wrap items-center gap-2">
+                            {productCategories
+                                .filter((cat) => isCategorySelected(cat))
+                                .map((cat, idx) => (
+                                    <span
+                                        key={idx}
+                                        className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-lg"
+                                    >
+                                        {cat.categoryname}
+                                        <button
+                                            onClick={() => categorySelectedToggle(cat)}
+                                            className="ml-1 text-blue-600 hover:text-red-600 font-bold"
+                                        >
+                                            <X size={20} />
+                                        </button>
+                                    </span>
+                                ))}
+                        </div>
+                    )}
+
+
+                    {/* Selected product types */}
+                    {numberOfSelectedFilters > 0 && (
+                        <div className="flex flex-wrap items-center gap-2">
+                            {productTypes
+                                .filter((cat) => isProductTypeSelected(cat))
+                                .map((cat, idx) => (
+                                    <span
+                                        key={idx}
+                                        className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-lg"
+                                    >
+                                        {cat.name}
+                                        <button
+                                            onClick={() => productTypeSelectedToggle(cat)}
+                                            className="ml-1 text-blue-600 hover:text-red-600 font-bold"
+                                        >
+                                            <X size={20} className="stroke-current" />
+                                        </button>
+                                    </span>
+                                ))}
+                        </div>
+                    )}
+
+
+                </div>
+
+                <div className="flex-1"></div>
+            </div>
+
+            <div className="flex gap-6 bg-customGreyLight text-left mt-10 text-2xl" >
+                {showFilters ?
+                    <div className="flex-[1]">
+
+                        <div className="ml-10 mb-10 font-bold">
+                            Vælg kategori
+                            {productCategories.map((productCategory, index) => (
+                                <label
+                                    key={index}
+                                    className="flex items-center gap-2 text-xl font-normal mt-5 cursor-pointer"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={isCategorySelected(productCategory)}
+                                        onChange={() => categorySelectedToggle(productCategory)}
+                                        className="w-5 h-5 bg-hoverYellowLight border-gray-300 rounded-2xl"
+                                    />
+                                    {productCategory.categoryname}
+                                </label>
+                            ))}
+                        </div>
+
+                        <div className="ml-10 font-bold">
+                            Vælg produkttype
+                            {productTypes.map((productType, index) => (
+
+
+                                <label
+                                    key={index}
+                                    className="flex items-center gap-2 text-xl font-normal mt-5 cursor-pointer"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={isProductTypeSelected(productType)}
+                                        onChange={() => productTypeSelectedToggle(productType)}
+                                        className="w-5 h-5 text-blue-600 border-gray-300 rounded"
+                                    />
+                                    {productType.name}
+                                </label>
+
+
+
+                            ))}
+                        </div>
+
+                    </div>
+                    : <div className="flex-[1]"></div>}
+
+
+                <div className="flex-[5] grid grid-cols-4 gap-6  bg-customGreyLight text-xl"
+                >
+
+                    {orderItemsProduct.map((orderItem) => (
+                        <ProductCard orderItem={orderItem} />
+                    ))}
+                </div>
+
+
+                <div className="flex-[1] mr-20">
+
+                    <div className="mt-10">
+                        <Cart />
+                    </div>
+
+                    <div className="text-2xl p-4 bg-gray-50 rounded-xl shadow-md mt-10">
+                        <h2 className="text-xl font-bold mb-2">
+                            Kontaktinfo:
+                        </h2>
+                        {/* Customer name */}
+                        <div className="mb-5">
+                            <label htmlFor="customerName" className="block text-xl">Navn</label>
+                            <input
+                                id="customerName"
+                                type="text"
+                                value={customerName}
+                                onChange={(e) => setCustomerName(e.target.value)}
+                                onBlur={() => setNameTouched(true)}
+                                placeholder="Indtast dit navn"
+                                className="text-xl"
+                                disabled={submitting}
+                            />
+                            {!isNameValid && nameTouched && (
+                                <p className="text-xl" style={{ color: 'red', marginTop: '0.25rem' }}>Navn må ikke være tomt.</p>
+                            )}
+                        </div>
+                        <div className="mb-5">
+                            <label htmlFor="phone" className="text-xl block">Telefonnummer:</label>
+                            <input
+                                id="phone"
+                                type="tel"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                onBlur={() => setPhoneTouched(true)}
+                                placeholder="+451234567890 eller 12345678"
+                                className="text-xl"
+                                maxLength={12}
+                                disabled={submitting}
+                            />
+                            {!isPhoneValid && phoneTouched && (
+                                <p className="text-xl" style={{ color: 'red', marginTop: '0.25rem' }}>
+                                    Telefonnummer skal være enten 8 cifre eller '+' efterfulgt af 10 cifre.
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Email */}
+                        <label htmlFor="email" className="text-xl block">Email:</label>
+                        <input
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            onBlur={() => setEmailTouched(true)}
+                            placeholder="Indtast din email"
+                            className="text-xl"
+                            disabled={submitting}
+                        />
+                        {!isEmailValid && emailTouched && (
+                            <p className="text-xl" style={{ color: 'red', marginTop: '0.25rem' }}>Indtast venligst en gyldig emailadresse.</p>
+                        )}
+
+                    </div>
+
+                    <div className="mt-10">
+                        <label htmlFor="comment" className="text-xl">Kommentarer til bestillingen:</label>
+                        <textarea
+                            id="comment"
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            placeholder="Skriv eventuelle ønsker eller bemærkninger her..."
+                            spellCheck='false'
+                            rows={3}
+                            className="text-xl w-96 h-40 border rounded p-2"
+                            disabled={submitting}
+                        />
+                    </div>
+
+                    <div className="mt-10">
+                        <button
+                            onClick={SubmitOrder}
+                            disabled={!isFormValid}
+                            style={{
+                                padding: '0.5rem 1rem',
+                                backgroundColor:
+                                    isFormValid && !submitting ? '#ffb84d' : 'grey',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor:
+                                    isFormValid && !submitting ? 'pointer' : 'not-allowed',
+                                marginRight: '0.5rem',
+                            }}
+                        >
+                            Send ordre
+                        </button>
+                    </div>
+
+                    {submitSuccess && (
+                        <div className="mt-4 p-4 bg-green-100 border border-green-400 text-green-800 rounded-lg shadow-md transition-opacity duration-500">
+                            {submitSuccess}
+                        </div>
+                    )}
+
+                    <div className="mt-10">
+                        <PickupLocation templateScedule={templateScedule} />
+                    </div>
+
+                </div>
+            </div >
+        </>
+    );
+}
+

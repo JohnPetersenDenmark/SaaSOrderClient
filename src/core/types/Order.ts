@@ -1,0 +1,28 @@
+import type { OrderItem } from './OrderItem';
+import type { TemplateSchedule } from './TemplateSchedule';
+import type { FishShopLightDto } from './FishShop';
+
+export interface Order {
+    id: number,
+    customerName: string,
+    customerorderCode: string,
+    phone: string
+    email: string
+    locationId: Number,
+    locationname: string,
+    locationstartdatetime: string,
+    locationenddatetime: string,
+    locationbeautifiedstartdatetime: string,
+    locationbeautifiedTimeInterval: string,
+    createddatetime: string   ,
+    modifieddatetime: string ,
+    payeddatetime : string,
+    comment: string
+    orderlines: OrderItem[],
+    totalPrice: number,
+    templateScheduleId : number,
+    fishShopId : number,
+    deliveryDate : string,
+      templateSchedule : TemplateSchedule | undefined,
+     fishShop :  FishShopLightDto | undefined
+}
