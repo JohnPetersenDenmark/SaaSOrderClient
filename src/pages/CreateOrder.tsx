@@ -359,20 +359,20 @@ export default function CreateOrder() {
 
     return (
         <>
-            <div className="flex flex-col gap-30  bg-customBlue text-left">
+            <div className="flex flex-col gap-30  bg-primaryBackgroundColor text-left">
                 <div className="flex">
                     {/* Column 1 */}
-                    <div className="flex-1  text-white p-4 text-left">
+                    <div className="flex-1  text-primaryTextColor p-4 text-left">
                         <img src="/images/jjfisk_logo.svg" alt="Logo" height={100} width={100} />
                     </div>
 
                     {/* Column 2 with nested row */}
-                    <div className="flex-1 text-white p-4">
+                    <div className="flex-1 text-primaryTextColor p-4">
                         <div className="grid grid-cols-5 gap-2 text-left">
                             <div className="text-2xl p-2">
                                 <span
                                     onClick={() => handleMenuSelection(1)}
-                                    className={`cursor-pointer hover:text-hoverYellow ${selectedMenuPoint == 1 ? 'text-hoverYellow' : 'text-white'}`} >
+                                    className={`cursor-pointer hover:text-hoverMenuActionsColor ${selectedMenuPoint == 1 ? 'text-hoverMenuActionsColor' : 'text-primaryTextColor'}`} >
                                     FORSIDE
                                 </span>
                             </div>
@@ -383,13 +383,13 @@ export default function CreateOrder() {
             </div>
 
 
-            <div className="flex text-left mt-10 text-2xl bg-white items-center">
+            <div className="flex text-left mt-10 text-2xl bg-primaryTextColor items-center">
                 <div className="flex-1"></div>
 
                 <div className="flex-[5] flex items-center gap-6">
                     {/* Filter button */}
                     <button
-                        className="flex items-center gap-2 bg-hoverYellowLight px-4 py-2 rounded hover:bg-white"
+                        className="flex items-center gap-2 bg-hoverMenuActionsColor px-4 py-2 rounded hover:bg-primaryTextColor"
                         onClick={() => handleShowFilters()}
                     >
                         <span>
@@ -449,7 +449,7 @@ export default function CreateOrder() {
                 <div className="flex-1"></div>
             </div>
 
-            <div className="flex gap-6 bg-customGreyLight text-left mt-10 text-2xl" >
+            <div className="flex gap-6 bg-thirdBackgroundColor text-left mt-10 text-2xl" >
                 {showFilters ?
                     <div className="flex-[1]">
 
@@ -464,7 +464,7 @@ export default function CreateOrder() {
                                         type="checkbox"
                                         checked={isCategorySelected(productCategory)}
                                         onChange={() => categorySelectedToggle(productCategory)}
-                                        className="w-5 h-5 bg-hoverYellowLight border-gray-300 rounded-2xl"
+                                        className="w-5 h-5 bg-hoverMenuActionsColor border-gray-300 rounded-2xl"
                                     />
                                     {productCategory.categoryname}
                                 </label>
@@ -498,7 +498,7 @@ export default function CreateOrder() {
                     : <div className="flex-[1]"></div>}
 
 
-                <div className="flex-[5] grid grid-cols-4 gap-6  bg-customGreyLight text-xl"
+                <div className="flex-[5] grid grid-cols-4 gap-6  bg-thirdBackgroundColor text-xl"
                 >
 
                     {orderItemsProduct.map((orderItem) => (
@@ -513,7 +513,7 @@ export default function CreateOrder() {
                         <Cart />
                     </div>
 
-                    <div className="text-2xl p-4 bg-gray-50 rounded-xl shadow-md mt-10">
+                    <div className="text-2xl p-4 bg-thirdBackgroundColor rounded-xl shadow-md mt-10">
                         <h2 className="text-xl font-bold mb-2">
                             Kontaktinfo:
                         </h2>

@@ -99,24 +99,24 @@ const DisplayListFishShopCalendar: React.FC<FishShopToSelectProps> = ({ onSelect
             {fishShops?.map((fishShop, index) => (
                 <div
                     key={index}
-                    className="bg-white text-customBlue p-4 rounded-lg shadow text-xl"
+                    className="bg-secondaryBackgroundColor text-primaryBackgroundColor p-4 rounded-lg shadow text-xl"
 
                 >
                     <p className="font-bold text-3xl">{fishShop.area?.name}</p>
-                    <p className="text-black text-lg mt-5">{locationNames[index]}</p>
+                    <p className="text-secondaryTextColor text-lg mt-5">{locationNames[index]}</p>
 
-                    <p className="text-hoverYellow text-xl mt-5 font-bold">
+                    <p className="text-hoverMenuActionsColor text-xl mt-5 font-bold">
                         Kontakt {fishShop.employee?.name} på telefon {fishShop.employee?.phone} i
                         vognens åbningstid.
                     </p>
-                    <p className="text-hoverYellow text-xl font-bold">
+                    <p className="text-hoverMenuActionsColor text-xl font-bold">
                         Du kan også sende en email til : {fishShop.employee?.email}
                     </p>
 
 
                     {locationsVisible[index] ?
                         <div
-                            className="flex text-black  mt-5 mb-5 font-bold text-1xl cursor-pointer"
+                            className="flex text-secondaryTextColor  mt-5 mb-5 font-bold text-1xl cursor-pointer"
                             onClick={() => toggleLocationVisible(index)}
                         >
                             <div className="flex">
@@ -128,7 +128,7 @@ const DisplayListFishShopCalendar: React.FC<FishShopToSelectProps> = ({ onSelect
                         </div>
                         :
                         <div
-                            className="flex text-black  mt-5 mb-5 font-bold text-1xl cursor-pointer"
+                            className="flex text-secondaryTextColor  mt-5 mb-5 font-bold text-1xl cursor-pointer"
                             onClick={() => toggleLocationVisible(index)}
                         >
                             <div className="flex">
@@ -145,7 +145,7 @@ const DisplayListFishShopCalendar: React.FC<FishShopToSelectProps> = ({ onSelect
                         <>
                             {fishShop.area?.templateSchedules?.map((templateSchedule, tsIndex) => (
                                 <>
-                                    <div className="grid grid-cols-2 items-center text-black text-lg mt-5 mb-5" key={tsIndex}
+                                    <div className="grid grid-cols-2 items-center text-secondaryTextColor text-lg mt-5 mb-5" key={tsIndex}
                                         onClick={() => handleSubmit(fishShop, templateSchedule)}
                                     >
                                         <div>

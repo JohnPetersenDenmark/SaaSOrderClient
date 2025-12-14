@@ -9,8 +9,10 @@ export type TenantConfig = {
   theme: {
     primaryBackGroundColor: string;
     secondaryBackgroundColor?: string;
+    thirdGreyBackgroundColor: string;
      primaryTextColor: string;
      secondaryTextColor: string;
+      addToBasketHoverColor : string
      hoverMenuActions : string
     mode?: "light" | "dark";
   };

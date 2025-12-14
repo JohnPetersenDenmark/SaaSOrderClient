@@ -14,10 +14,10 @@ const { cart } = useCart();
   );
 
    return (
-    <div className="text-2xl p-4 bg-gray-50 rounded-xl shadow-md">
+    <div className="text-2xl p-4 bg-thirdBackgroundColor rounded-xl shadow-md">
       <h2 className="text-2xl font-bold mb-2">🛒 Din kurv</h2>
       {items.length === 0 ? (
-        <p className="text-gray-500">Kurven er tom</p>
+        <p className="text-thirdBackgroundColor">Kurven er tom</p>
       ) : (
         <ul>
           {items.map((item) => (

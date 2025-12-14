@@ -17,7 +17,7 @@ const PickupLocation: React.FC<PickupLocationProps> = ({ templateScedule }) => {
   
 
     return (
-        <div className="text-2xl p-4 bg-gray-50 rounded-xl shadow-md">
+        <div className="text-2xl p-4 bg-thirdBackgroundColor rounded-xl shadow-md">
             <h2 className="text-xl font-bold mb-2">
                 Afhentning:
             </h2>

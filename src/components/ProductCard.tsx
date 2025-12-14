@@ -14,8 +14,8 @@ const ProductCard: React.FC<OrderItemProps> = ({ orderItem }) => {
   const total = quantity * orderItem.unitprice;
 
   return (
-    <div className="max-w-sm rounded-2xl shadow-md bg-white p-4">
-      <div className="inline-block bg-customBlue text-white text-xs font-semibold px-2 py-1 rounded">
+    <div className="max-w-sm rounded-2xl shadow-md bg-secondaryBackgroundColor p-4">
+      <div className="inline-block bg-primaryBackgroundColor text-primaryTextColor text-xs font-semibold px-2 py-1 rounded">
         {orderItem.badge}
       </div>
 
@@ -28,7 +28,7 @@ const ProductCard: React.FC<OrderItemProps> = ({ orderItem }) => {
       <div className="flex items-center justify-between mt-4 mb-10">
         <div>
           <h3 className="font-semibold text-lg">Kategori</h3>
-          <p className="text-gray-500"></p>
+          <p className="text-thirdBackgroundColor"></p>
 
           <div className="mt-2 text-sm">
             {orderItem.productcategories && orderItem.productcategories.map((category) => (
@@ -41,7 +41,7 @@ const ProductCard: React.FC<OrderItemProps> = ({ orderItem }) => {
 
         <div className="mr-5">
           <h3 className="font-semibold text-lg">Type</h3>
-          <p className="text-gray-500"></p>
+          <p className="text-thirdBackgroundColor"></p>
 
           <div className="mt-2 text-sm">
             {orderItem.producttypes && orderItem.producttypes.map((type) => (
@@ -57,7 +57,7 @@ const ProductCard: React.FC<OrderItemProps> = ({ orderItem }) => {
       <div className="items-center justify-between mt-4 mb-10">
         <div className="mr-5">
           <h3 className="font-semibold text-lg">Mærkning</h3>
-          <p className="flex-1 text-gray-500"></p>
+          <p className="flex-1 text-thirdBackgroundColor"></p>
 
           <div className="flex mt-2 text-sm">
             {orderItem.productlabels && orderItem.productlabels.map((label) => (
@@ -75,11 +75,11 @@ const ProductCard: React.FC<OrderItemProps> = ({ orderItem }) => {
       </div>
 
       <h3 className="font-semibold text-lg">{orderItem.productname}</h3>
-      <p className="text-gray-500">{orderItem.weight}</p>
+      <p className="text-thirdBackgroundColor">{orderItem.weight}</p>
 
       <div className="mt-2">
         <p className="text-2xl font-bold">{orderItem.unitprice.toFixed(2)} kr</p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-thirdBackgroundColor">
           {orderItem.pricePerKg} kr/kg
         </p>
       </div>
@@ -89,7 +89,7 @@ const ProductCard: React.FC<OrderItemProps> = ({ orderItem }) => {
         {quantity === 0 ? (
           <button
             onClick={() => addToCart(orderItem)}
-            className="flex items-center gap-2 bg-hoverYellowLight text-white px-4 py-2 rounded-xl hover:bg-green-800"
+            className="flex items-center gap-2 bg-hoverMenuActionsColor text-primaryTextColor px-4 py-2 rounded-xl hover:bg-addToBasketHoverColor"
           >
             <ShoppingCart size={18} /> Læg i kurv
           </button>
@@ -97,14 +97,14 @@ const ProductCard: React.FC<OrderItemProps> = ({ orderItem }) => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => removeFromCart(orderItem.productid.toString())}
-              className="px-3 py-1 bg-gray-200 rounded-lg"
+              className="px-3 py-1 bg-thirdBackgroundColor rounded-lg"
             >
               -
             </button>
             <span className="font-semibold">{quantity}</span>
             <button
               onClick={() => addToCart(orderItem)}
-              className="px-3 py-1 bg-gray-200 rounded-lg"
+              className="px-3 py-1 bg-thirdBackgroundColor rounded-lg"
             >
               +
             </button>

@@ -5,16 +5,18 @@ const JJfisk: TenantConfig = {
   id: "JJfisk",
   name: "JJfisk ApS",
 
-   apiBaseUrl: "http://192.168.1.52:5000",
-//apiBaseUrl: "http://www.dotnetdev.dk",
-  
+  apiBaseUrl: "http://192.168.1.52:5000",
+  //apiBaseUrl: "http://www.dotnetdev.dk",
+
 
   theme: {
     primaryBackGroundColor: "#5470a9",
-    secondaryBackgroundColor: "Grey",
+    secondaryBackgroundColor: "#ffffff",
+    thirdGreyBackgroundColor: "#f7f7f7",
     primaryTextColor: '#ffffff',
     secondaryTextColor: '#000000',
     hoverMenuActions: "#ffb84d",
+    addToBasketHoverColor: "Green",
     mode: "light"
   },
 
@@ -22,8 +24,8 @@ const JJfisk: TenantConfig = {
     orders: true,
     inventory: false
   },
-  
- marketing: {
+
+  marketing: {
     heroTitle: "JJ Fisk - En seriøs fiskehandler",
     heroSubtitle1: "VI KØRER I HELE MIDTJYLLAND",
     heroSubtitle2: "Friske fisk i Aarhus og Midtjylland",

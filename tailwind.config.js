@@ -10,8 +10,13 @@ export default {
          primaryTextColor: "var(--primary-text-color)",
         secondaryTextColor: "var(--secondary-text-color)",
 
+        thirdBackgroundColor : "var(--third-background-color)",
+
         
         hoverMenuActionsColor : "var(--hover-menuactions-color)",
+ addToBasketHoverColor: "var(--addto-basket-color)",
+        
+       
       },
     },
   },

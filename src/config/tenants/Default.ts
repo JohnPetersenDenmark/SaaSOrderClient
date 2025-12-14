@@ -4,12 +4,14 @@ const Default: TenantConfig = {
  id: "Default",
   name: "Default ApS",
 
-     //apiBaseUrl: "http://192.168.1.52:5000",
-apiBaseUrl: "http://www.dotnetdev.dk",
+     apiBaseUrl: "http://192.168.1.52:5000",
+
 
   theme: {
     primaryBackGroundColor: "Green",
     secondaryBackgroundColor: "#6610f2",
+      addToBasketHoverColor : "green",
+     thirdGreyBackgroundColor : "blue",
     primaryTextColor : 'Blue',
      secondaryTextColor : '#000000',
      hoverMenuActions : "Black",

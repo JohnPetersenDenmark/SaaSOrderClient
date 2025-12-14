@@ -25,6 +25,13 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     root.style.setProperty("--primary-background-color", theme.primaryBackGroundColor);
     root.style.setProperty("--secondary-background-color", theme.secondaryBackgroundColor ?? theme.primaryBackGroundColor);
 
+    root.style.setProperty("--third-background-color", theme.thirdGreyBackgroundColor ?? theme.thirdGreyBackgroundColor);
+
+     root.style.setProperty("--addto-basket-color", theme.addToBasketHoverColor ?? theme.addToBasketHoverColor);
+    
+
+    
+
     root.style.setProperty("--primary-text-color", theme.primaryTextColor);
     root.style.setProperty("--secondary-text-color", theme.secondaryTextColor ?? theme.primaryTextColor);
 
