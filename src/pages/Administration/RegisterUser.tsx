@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { get , post } from '../../core/api/axiosHttpClient';
+import {  post } from '../../core/api/axiosHttpClient';
 import type { User } from '../../core/types/User';
 
 interface RegisterModalProps {
@@ -33,8 +33,7 @@ const RegisterUser: React.FC<RegisterModalProps> = ({ isOpen, userToEdit, onClos
     const isDisplayNameValid = displayname.length > 0;
     const isFormValid = isPasswordValid && isUserNameValid;
 
-    let x = 1;
-
+    
     useEffect(() => {
         if (!isOpen) return;
 

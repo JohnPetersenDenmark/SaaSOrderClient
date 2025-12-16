@@ -1,0 +1,812 @@
+import { ChevronDown } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import type { Order } from "../../core/types/Order";
+import TestRealTimeUpdate from "../../components/TestRealTimeUpdate";
+
+// import { TruckLocation } from '../../types/TruckLocation';
+import type { SaleLocation } from '../../core/types/SaleLocation';
+import type { Payment } from "../../core/types/Payment";
+import { filterOrderByTodaysDate } from "../../core/types/MiscFunctions";
+import { filterTruckLocationsByTodaysDate } from '../../core/types/MiscFunctions';
+import { parseDanishDateTime } from '../../core/types/MiscFunctions';
+import ClipLoader from 'react-spinners/ClipLoader';
+import { get, post, remove } from "../../core/api/axiosHttpClient";
+import type { FishShopLightDto } from '../../core/types/FishShop';
+
+
+
+const AdminOrders: React.FC = () => {
+
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [allOrdersSorted, setAllOrdersSorted] = useState<Order[]>([]);
+  //  const [filterredorders, setFilteredOrders] = useState<Order[]>([]);
+
+  const [payments, setPayments] = useState<Payment[]>([]);
+
+  const [newOrderArrived, setNewOrderArrived] = useState(false);
+
+  const [selectedLocation, setSelectedLocation] = useState<SaleLocation | null>(null);
+  const [locations, setLocations] = useState<SaleLocation[]>([]);
+
+  const [selectedLocationId, setSelectedLocationId] = useState<string>('');
+  const [locationTouched, setLocationTouched] = useState(false);
+
+  const [fishShops, setFishShops] = useState<FishShopLightDto[]>([]);
+  const [selectedFishShopId, setSelectedFishShopId] = useState<string>('');
+  const [selectedFishShop, setSelectedFishShop] = useState<FishShopLightDto | null>(null);
+  const [fishShopTouched, setFishShopTouched] = useState(false);
+
+  const [reload, setReload] = useState(0);
+  const [isEditOrderModalOpen, setsEditOrderModalOpen] = useState(false);
+  const [orderToEdit, setOrderToEdit] = useState<Order | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [loadingLocations, setLoadingLocations] = useState(false);
+  const [loadingPayments, setLoadingPayments] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  let NewOrder: Order | null;
+
+  let token: string;
+
+  useEffect(() => {
+    const fetchData = async () => {
+
+
+      try {
+        setLoadingOrders(true);
+
+        const ordersResponse : any = await get('/Home/orderlistnew');
+
+        // const ordersFromTodayAndForward = filterOrderByTodaysDate(ordersResponse);
+
+        var tmpDate = new Date(ordersResponse[0].deliveryDate).getTime();
+
+        const sortedOrders = ordersResponse.sort(
+          (a : any, b : any) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime()
+        );
+
+        setAllOrdersSorted(sortedOrders);
+
+        setOrders(sortedOrders);
+
+        // setFilteredOrders(sortedOrders);
+
+
+      } catch (err: any) {
+        setError(err.message || 'Failed to load orders');
+        console.error(err);
+      } finally {
+        setLoadingOrders(false);
+      }
+
+      try {
+        setLoadingPayments(true);
+        const paymentsResponse : any = await get('/Admin/paymentlist');
+        setPayments(paymentsResponse);
+
+      } catch (err) {
+        setError('Failed to load payments');
+        console.error(err);
+
+      } finally {
+        setLoadingPayments(false);
+      }
+
+
+
+      try {
+        setLoadingLocations(true);
+
+        const locationsResponse : any = await get('/Home/locationlist');
+        setLocations(locationsResponse);
+      } catch (err) {
+        setError('Failed to load locations');
+        console.error(err);
+      } finally {
+        setLoadingLocations(false);
+      }
+
+      try {
+        setLoadingLocations(true);
+
+        const fishShopsResponse : any = await get('/Admin/fishshoplistnew');
+        setFishShops(fishShopsResponse);
+      } catch (err) {
+        setError('Failed to load locations');
+        console.error(err);
+      } finally {
+        setLoadingLocations(false);
+      }
+    };
+
+    fetchData();
+
+
+  }, [newOrderArrived, reload]);
+
+
+  const handleNewOrderArrived = (data: Order) => {
+    setNewOrderArrived(true);
+    setReload(prev => prev + 1);
+    if (data !== null && data !== undefined) {
+      NewOrder = data;
+    }
+    else {
+      NewOrder = null;
+    }
+  };
+
+  const filteredOrders = orders.filter(order => {
+
+
+    const orderIdMatches = order.customerorderCode.toString().includes(searchQuery);
+    const customerNameMatches = order.customerName?.toLowerCase().includes(searchQuery.toLowerCase());
+    const orderLineMatches = order.orderlines?.some(line =>
+      line.productname?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    return orderIdMatches || customerNameMatches || orderLineMatches
+  });
+
+  function filterOrdersByFishShopSelection(ordersToFilterFrom: Order[], fishShopId: string) {
+
+    let fishShopIdMatches = false;
+    return ordersToFilterFrom.filter(order => {
+
+
+      if (fishShopId !== '') {
+        fishShopIdMatches = order.fishShop?.id === Number(fishShopId);
+      }
+
+      return fishShopIdMatches;
+    });
+  }
+
+  function filterOrdersByLocationSelection(ordersToFilterFrom: Order[], locationId: string) {
+    let locationIdMatches = false;
+    return ordersToFilterFrom.filter(order => {
+      if (locationId != '') {
+        locationIdMatches = order.templateSchedule?.locationid == Number(locationId)
+      }
+      return locationIdMatches
+    });
+  }
+
+  const highlightText = (text: string, query: string) => {
+    if (!query) return text;
+    if (!text) {
+      return text;
+    }
+
+    const regex = new RegExp(`(${query})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, i) =>
+      regex.test(part) ? <mark key={i}>{part}</mark> : part
+    );
+  };
+
+  const displayedOrders = searchQuery.trim() === '' ? orders : filteredOrders;
+
+  //const displayedOrders = filteredOrders;
+
+  /*  function parseDanishDateTime(dateTimeStr: string): Date {
+ 
+ 
+     try {
+         // Split into date and time
+     const [dateStr, timeStr] = dateTimeStr.split(' ');
+ 
+     // Parse date part
+     const [day, month, year] = dateStr.split('-').map(Number);
+ 
+     // Parse time part
+     const [hour, minute] = timeStr.split(':').map(Number);
+ 
+     // JS Date months are 0-indexed
+     return new Date(year, month - 1, day, hour, minute);
+ 
+     } catch (error) {
+      var x = 1;
+      return new Date
+     }
+ 
+  
+   } */
+
+
+  function formatDateToDanish(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: "Europe/Copenhagen",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    };
+
+    const parts = new Intl.DateTimeFormat("da-DK", options).formatToParts(date);
+    const get = (type: string) => parts.find(p => p.type === type)?.value ?? "";
+
+    return `${get("day")}-${get("month")}-${get("year")} ${get("hour")}:${get("minute")}`;
+  }
+
+  function formatDateToDanishDateOnly(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: "Europe/Copenhagen",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    };
+
+    const parts = new Intl.DateTimeFormat("da-DK", options).formatToParts(date);
+    const get = (type: string) => parts.find(p => p.type === type)?.value ?? "";
+
+    return `${get("day")}-${get("month")}-${get("year")}`;
+  }
+  /*   const filterOrderByTodaysDate = ((sorders: Order[]) => {
+      const now = new Date();
+      const year = now.getUTCFullYear();
+      const month = now.getUTCMonth(); // 0-based
+      const day = now.getUTCDate();
+  
+      // Create start and end times in UTC
+      const startTimeToday = new Date(Date.UTC(year, month, day, 0, 10, 0));  // today 00:10:00 UTC
+      const endTimeToday = new Date(Date.UTC(year, month, day, 23, 59, 59));  // today 23:59:59 UTC
+  
+      let filteredOrdersByDate: Order[] = []
+  
+      sorders.forEach(order => {
+        // const created = parseDanishDateTime(order.createddatetime); // assumes createdAt is ISO UTC string
+  
+        const locationDate = parseDanishDateTime(order.locationstartdatetime); // assumes createdAt is ISO UTC string
+  
+        // if (created >= startTime && created <= endTime) {
+        if (locationDate >= startTimeToday) {
+          filteredOrdersByDate.push(order);
+        }
+      });
+      return filteredOrdersByDate
+    }); */
+
+  /*  const filterTruckLocationsByTodaysDate = ((slocations: TruckLocation[]) => {
+     const now = new Date();
+     const year = now.getUTCFullYear();
+     const month = now.getUTCMonth(); // 0-based
+     const day = now.getUTCDate();
+ 
+     // Create start and end times in UTC
+     const startTime = new Date(Date.UTC(year, month, day, 0, 10, 0));  // today 00:10:00 UTC
+     const endTime = new Date(Date.UTC(year, month, day, 23, 59, 59));  // today 23:59:59 UTC
+ 
+     let filteredLocationsByDate: TruckLocation[] = []
+ 
+     slocations.forEach(location => {
+       // const created = parseDanishDateTime(order.createddatetime); // assumes createdAt is ISO UTC string
+ 
+       const locationDate = parseDanishDateTime(location.startdatetime); // assumes createdAt is ISO UTC string
+ 
+       if (locationDate >= startTime) {
+         filteredLocationsByDate.push(location);
+       }
+     });
+     return filteredLocationsByDate
+   }); */
+
+  const handleEditOrder = (order: Order) => {
+    setOrderToEdit(order);
+    setsEditOrderModalOpen(true);
+  };
+
+  const handleDeleteOrder = (order: Order) => {
+    if (order !== null) {
+      const deleteOrder = async () => {
+        try {
+          setSubmitting(true);
+
+          await remove('/Admin/removeorder/' + order.id)
+          setReload(prev => prev + 1);
+        } catch (error) {
+          setError('Failed to delete order');
+          console.error(error);
+        } finally {
+          setSubmitting(false);
+        }
+      };
+      deleteOrder();
+    }
+  };
+
+  const handleRemoveComment = (order: Order) => {
+    if (order !== null) {
+      const updateOrder = async () => {
+        try {
+          setSubmitting(true);
+
+          post('/Home/orderremovecomment', { id: order.id })
+          setReload(prev => prev + 1);
+        } catch (error) {
+          setError('Failed to update order');
+          console.error(error);
+        } finally {
+          setSubmitting(false);
+        }
+      };
+      updateOrder();
+    }
+  };
+
+  const handleLocationChanged = (locationId: string) => {
+
+    setSelectedLocationId(locationId);
+
+    /*
+        if (locationId) {
+          let filteredByLocation = filterOrdersByLocation(allOrdersSorted, locationId)
+          setOrders(filteredByLocation);
+        }
+        else {
+          setOrders(allOrdersSorted);
+        } */
+
+    let location = locations.find(tmpLocation => tmpLocation.id === Number(locationId));
+    if (location) {
+      setSelectedLocation(location);
+    }
+
+    setOrders(allOrdersSorted);
+
+    let filteredFishShopsArray: Order[] = [];
+
+    if (selectedFishShopId === '') {
+      if (locationId === '') {
+
+        return
+      }
+      else {
+        let filteredOrdersByLocationArray = filterOrdersByLocationSelection(allOrdersSorted, locationId);
+        setOrders(filteredOrdersByLocationArray)
+        return
+      }
+    }
+    else {
+
+      filteredFishShopsArray = filterOrdersByFishShopSelection(allOrdersSorted, selectedFishShopId);
+      if (locationId === '') {
+        setOrders(filteredFishShopsArray);
+        return;
+      }
+
+      let resultBothCriterias = filterOrdersByLocationSelection(filteredFishShopsArray, locationId);
+
+      setOrders(resultBothCriterias);
+      return;
+
+    }
+
+  };
+
+  const handleFishShopChanged = (fishShopId: string) => {
+
+    setSelectedFishShopId(fishShopId);
+
+    /*   if (fishShopId) {
+        let filteredByFishShop = filterOrdersByFishShop(allOrdersSorted, fishShopId)
+        setOrders(filteredByFishShop);
+      }
+      else {
+        setOrders(allOrdersSorted);
+      } */
+
+    let fishShop = fishShops.find(tmpFishShop => tmpFishShop.id === Number(fishShopId));
+    if (fishShop) {
+      setSelectedFishShop(fishShop);
+    }
+
+    let filteredFishShopsArray: Order[] = [];
+
+    setOrders(allOrdersSorted);
+
+    if (fishShopId === '') {
+      if (selectedLocationId === '') {
+        return
+      }
+      else {
+        let filteredOrdersByLocationArray = filterOrdersByLocationSelection(allOrdersSorted, selectedLocationId);
+        setOrders(filteredOrdersByLocationArray)
+        return
+      }
+    }
+    else {
+
+      filteredFishShopsArray = filterOrdersByFishShopSelection(allOrdersSorted, fishShopId);
+      if (selectedLocationId === '' && filteredFishShopsArray.length > 0) {
+        setOrders(filteredFishShopsArray);
+        return;
+      }
+
+      let resultBothCriterias = filterOrdersByLocationSelection(filteredFishShopsArray, selectedLocationId);
+
+      setOrders(resultBothCriterias);
+      return;
+
+    }
+
+
+  };
+
+
+
+  const filterOrdersByLocation = ((sorders: Order[], truckLocationId: string) => {
+
+    let filteredOrdersByComment: Order[] = []
+
+    if (!truckLocationId) {
+      return filteredOrdersByComment
+    }
+
+    let copyOfSelectedLocationId = Number(truckLocationId);
+
+    sorders.forEach(order => {
+
+      if (order.locationId == copyOfSelectedLocationId) {
+
+        filteredOrdersByComment.push(order);
+      }
+
+    });
+    return filteredOrdersByComment
+  })
+
+  const filterOrdersByFishShop = ((sorders: Order[], fishShopId: string) => {
+
+    let filteredOrdersByFishShop: Order[] = []
+
+    if (!fishShopId) {
+      return filteredOrdersByFishShop
+    }
+
+    let copyOfSelectedFishShopId = Number(fishShopId);
+
+    sorders.forEach(order => {
+
+      if (order.fishShop?.id == copyOfSelectedFishShopId) {
+
+        filteredOrdersByFishShop.push(order);
+      }
+
+    });
+    return filteredOrdersByFishShop
+  })
+
+  function isOrderPaid(orderId: string) {
+    return payments.some(payment => payment.orderid === orderId && payment.flatratestatusorerror === null);
+  }
+
+  // Responsive styles
+  const styles = {
+    container: {
+      border: '1px solid grey',
+      padding: '10px',
+      borderRadius: '5px',
+      fontSize: '20px',
+      color: '#22191b',
+      fontWeight: 200,
+      textAlign: 'center' as const,
+      // maxWidth: 1400,
+      margin: 'auto',
+    },
+    headerGrid: {
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      alignItems: 'center',
+      gap: '10px',
+      marginBottom: '1rem',
+      padding: '0 10px',
+    },
+    searchInput: {
+      width: '100%',
+      padding: '0.5rem',
+      fontSize: '1.2rem',
+      borderWidth: '1.0px',
+      borderStyle: 'solid',
+      borderRadius: '4px',
+      boxSizing: 'border-box' as const,
+    },
+    title: {
+      fontSize: '2rem',
+      fontWeight: 600,
+      color: '#22191b',
+      margin: '20px',
+      textAlign: 'center' as const,
+    },
+    orderCard: {
+      border: '1px solid #ccc',
+      padding: '10px',
+      marginBottom: '30px',
+      borderRadius: '6px',
+    },
+    orderHeader: {
+      marginBottom: '15px',
+      padding: '10px',
+      textAlign: 'left' as const,
+      fontSize: '22px',
+      backgroundColor: '#5470a9',
+      color: 'white',
+      borderRadius: '4px',
+      wordBreak: 'break-word' as const,
+    },
+    ordersGridHeader: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(1, 1fr)',
+      fontWeight: 700,
+      fontSize: '14px',
+      marginBottom: '8px',
+      padding: '0 5px',
+      textAlign: 'left' as const,
+    },
+    ordersGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, 1fr)',
+      alignItems: 'center',
+      fontSize: '14px',
+      padding: '0 5px',
+      wordBreak: 'break-word' as const,
+      gap: '4px',
+    },
+    icon: {
+      cursor: 'pointer',
+      width: 24,
+      height: 24,
+      display: 'inline-block',
+    },
+    commentBox: {
+      marginTop: '15px',
+      marginBottom: '15px',
+      backgroundColor: '#17db4e',
+      display: 'grid',
+      gridTemplateColumns: 'auto 1fr',
+      alignItems: 'center',
+      padding: '5px 10px',
+      borderRadius: '4px',
+      wordBreak: 'break-word' as const,
+    },
+    commentIcon: {
+      cursor: 'pointer',
+      width: 24,
+      height: 24,
+      marginRight: '10px',
+    },
+    orderlinesContainer: {
+      border: '1px solid #ccc',
+      padding: '10px',
+      marginBottom: '10px',
+      fontSize: '18px',
+      textAlign: 'left' as const,
+
+      // gridTemplateColumns: 'auto 1fr auto auto',
+
+      alignItems: 'center',
+
+      borderRadius: '4px',
+    },
+    subtotalGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'auto auto 1fr auto',
+      alignItems: 'center',
+      textAlign: 'left' as const,
+      fontWeight: 'bold',
+      fontSize: '16px',
+      marginTop: '20px',
+      gap: '10px',
+    },
+    mark: {
+      backgroundColor: 'yellow',
+    }
+  };
+
+  // Responsive grid columns and styles with media queries
+  const mediaQueries = `
+    @media (max-width: 768px) {
+      .ordersGridHeader {
+        display: none;
+      }
+      .ordersGrid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .orderlineGrid {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      .subtotalGrid {
+        grid-template-columns: 1fr 1fr;
+        font-size: 14px;
+      }
+      input[type="text"] {
+        font-size: 1rem !important;
+      }
+    }
+  `;
+
+  return (
+    <>
+      <style>{mediaQueries}</style>
+      {/* <div style={{ styles.container, width: '100vw', overflowX: 'hidden' }}> */}
+      <div style={styles.container}>
+        <div style={styles.title}>Ordrer</div>
+
+        <TestRealTimeUpdate doNotify={handleNewOrderArrived} />
+
+
+        <div style={styles.headerGrid}>
+
+          <div className="flex gap-4">
+            {/* Fish shop select */}
+            <div className="flex flex-col w-1/3">
+              <label htmlFor="fishshopSelect" className="mb-1 text-sm font-medium text-gray-700">
+                Bil
+              </label>
+              <select
+                id="fishshopSelect"
+                value={selectedFishShopId}
+                onChange={(e) => handleFishShopChanged(e.target.value)}
+                onBlur={() => setFishShopTouched(true)}
+                disabled={submitting}
+                className="appearance-none rounded-2xl border border-customBlue p-2 text-gray-700 shadow-sm 
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 
+                 disabled:bg-gray-100 disabled:text-gray-400"
+              >
+                <option value="">-- Alle --</option>
+                {fishShops.map((fishShop) => (
+                  <option key={fishShop.id} value={fishShop.id}>
+                    {fishShop.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Location select */}
+            <div className="flex flex-col w-1/3">
+              <label htmlFor="locationSelect" className="mb-1 text-sm font-medium text-gray-700">
+                Lokation
+              </label>
+              <select
+                id="locationSelect"
+                value={selectedLocationId}
+                onChange={(e) => handleLocationChanged(e.target.value)}
+                onBlur={() => setLocationTouched(true)}
+                disabled={submitting}
+                className="appearance-none rounded-2xl border border-customBlue p-2 text-gray-700 shadow-sm 
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 
+                 disabled:bg-gray-100 disabled:text-gray-400"
+              >
+                <option value="">-- Alle --</option>
+                {locations.map((loc) => (
+                  <option key={loc.id} value={loc.id}>
+                    {loc.locationname}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Search input */}
+            <div className="flex flex-col w-1/3">
+              <label htmlFor="searchInput" className="mb-1 text-sm font-medium text-gray-700">
+                Søg
+              </label>
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="Søg"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="rounded-2xl border border-customBlue p-2 text-gray-700 shadow-sm 
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 
+                 disabled:bg-gray-100 disabled:text-gray-400"
+              />
+            </div>
+          </div>
+
+
+        </div>
+
+        {/* Inner wrapper to constrain max width and add side padding */}
+        <div style={{ padding: '0 10px', textAlign: 'left' }}>
+          {loadingOrders || loadingLocations ? <div><ClipLoader size={50} color="#8d4a5b" /></div> : ''}
+          {error && <div style={{ color: 'red' }}>{error}</div>}
+
+          {displayedOrders.map((curOrder) => {
+            const subtotal = curOrder.orderlines.reduce(
+              (sum, line) => sum + line.unitprice * line.quantity,
+              0
+            );
+
+            const subtotalPizzas = curOrder.orderlines
+              .filter((line) => line.producttype === 0)
+              .reduce((sum, line) => sum + line.quantity, 0);
+
+            const subtotalToppings = curOrder.orderlines
+              .filter((line) => line.producttype === 1)
+              .reduce((sum, line) => sum + line.quantity, 0);
+
+            return (
+              <div key={curOrder.id} style={styles.orderCard}>
+                <div style={styles.orderHeader}>
+                  {curOrder?.fishShop?.name && curOrder?.fishShop.name}  {formatDateToDanishDateOnly(new Date(curOrder.deliveryDate))} {curOrder.templateSchedule?.location.locationname}
+                </div>
+
+                <div className="grid grid-cols-4" >
+                  <div >Best nr.:  {highlightText(curOrder.customerorderCode, searchQuery)}</div>
+                  <div >Leveringsdato: {formatDateToDanishDateOnly(new Date(curOrder.deliveryDate))}</div>
+                  <div >Kunde: {highlightText(curOrder.customerName, searchQuery)}</div>
+                  <div >Oprettet: {formatDateToDanish(new Date(curOrder.createddatetime + "Z"))}</div>
+
+                  <div> Slet ordre <img
+                    src="/images/delete-icon.png"
+                    alt="Delete"
+                    onClick={() => handleDeleteOrder(curOrder)}
+                    style={styles.icon}
+                  /></div>
+                  <div></div>
+                  <div >Telefon: {curOrder.phone}</div>
+                  <div >Ændret: {formatDateToDanish(new Date(curOrder.modifieddatetime + "Z"))}</div>
+                  <div></div>
+                  <div></div>
+                  <div >Email: {curOrder.email}</div>
+
+                  <div></div>
+                  <div></div>
+                </div>
+
+
+                {curOrder.comment.trim().length > 0 && (
+                  <div style={styles.commentBox}>
+                    <img
+                      src="/images/delete-icon.png"
+                      alt="Remove Comment"
+                      onClick={() => handleRemoveComment(curOrder)}
+                      style={styles.commentIcon}
+                    />
+                    <div>{curOrder.comment}</div>
+                  </div>
+                )}
+
+                <div style={styles.orderlinesContainer}>
+                  {curOrder.orderlines.map((curOrderLine, lineIndex) => (
+                    <div key={lineIndex} className="grid grid-cols-4" >
+                      <div>{curOrderLine.quantity} stk.</div>
+                      <div>
+                        {curOrderLine.productnumber} {highlightText(curOrderLine.productname, searchQuery)}
+                      </div>
+                      <div style={{ textAlign: 'right' }}>{curOrderLine.unitprice.toFixed(2).replace('.', ',')} kr.</div>
+                      <div style={{ textAlign: 'right' }}>
+                        {(curOrderLine.unitprice * curOrderLine.quantity)
+                          .toFixed(2)
+                          .replace('.', ',')} kr.
+                      </div>
+                    </div>
+                  ))}
+
+                  <div style={styles.subtotalGrid}>
+                    <div>Antal varer: {subtotalPizzas}</div>
+                    <div></div>
+                    <div style={{ textAlign: 'right' }}>Ialt: {subtotal.toFixed(2).replace('.', ',')}</div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+
+};
+
+export default AdminOrders;

@@ -5,11 +5,13 @@ import { CurrentUser, useCurrentUser } from './CurrentUser';
 
 import AdminPlaces from '../pages/Administration/AdminPlaces';
 import AdminProducts from './admin/AdminProducts';
+import AdminFishshop from '../pages/Administration/AdminFishshop';
  import AdminCalendar from './admin/AdminCalendar';
-/* import AdminOrders from './AdminOrders'
-import AdminAllOrders from './AdminAllOrders'
+ import AdminOrders from '../pages/Administration/AdminOrders';
 
-import AdminFishShops from './AdminFishshops'
+/*  import AdminAllOrders from './AdminAllOrders'
+
+
 import AdminEmployee from './AdminEmployee';
 import AdminOperatingArea from './AdminOperatingArea';
 import AdminProductCategories from './AdminProductCategories';
@@ -68,20 +70,22 @@ const TopMenuAdmin: React.FC = () => {
     }
     menuArray.push(newMenuPoint)
 
-    /* let newMenuPoint = {
+      newMenuPoint = {
         clickableText: "Ordrer",
         component: AdminOrders
     }
     menuArray.push(newMenuPoint)
 
-
-    
-
     newMenuPoint = {
         clickableText: "Biler",
-        component: AdminFishShops
+        component: AdminFishshop
     }
     menuArray.push(newMenuPoint)
+
+
+    /*
+
+    
 
    
 
