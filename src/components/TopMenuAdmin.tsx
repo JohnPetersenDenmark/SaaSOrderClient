@@ -1,10 +1,14 @@
 import React, {  useState } from 'react';
+import { useDashboardContext } from './admin/DashboardContext';
+import { CurrentUser, useCurrentUser } from './CurrentUser'; 
+
 
 import AdminPlaces from '../pages/Administration/AdminPlaces';
-/* import AdminCalendar from './AdminCalendar'
-import AdminOrders from './AdminOrders'
+import AdminProducts from './admin/AdminProducts';
+ import AdminCalendar from './admin/AdminCalendar';
+/* import AdminOrders from './AdminOrders'
 import AdminAllOrders from './AdminAllOrders'
-import AdminMenues from './AdminMenues'
+
 import AdminFishShops from './AdminFishshops'
 import AdminEmployee from './AdminEmployee';
 import AdminOperatingArea from './AdminOperatingArea';
@@ -12,6 +16,7 @@ import AdminProductCategories from './AdminProductCategories';
 import AdminProductTypes from './AdminProductTypes';
 import AdminProductLabels from './AdminProductLabels'; */
 // import { useNavigate } from "react-router-dom";
+//import { initAxiosClient } from '../core/api/axiosHttpClient';
 
 // import RevenuePerTimePeriod from './admin/Statistic/RevenuePerTimePeriod';
 
@@ -19,33 +24,27 @@ import AdminProductLabels from './AdminProductLabels'; */
 // import AdminUsers from '../pages/Administration/AdminUsers';
 //import AdminSettings from './AdminSettings'
 //import AdminPackingList from './AdminPackingList';
-// import { useDashboardContext } from './admin/DashboardContext';
+ 
 
-// import { CurrentUser, useCurrentUser } from './CurrentUser'; 
-
-
-/* interface DashboardModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-} */
+ 
 
 interface MenuPoint {
     clickableText: string;
     component: React.ComponentType; // points to actual component
 }
-// const AdminDashBoard: React.FC<DashboardModalProps> = ({ isOpen, onClose }) => {
+
 const TopMenuAdmin: React.FC = () => {
 
-   // const { user, authStatus } = useCurrentUser();
+    //const { user, authStatus } = useCurrentUser();
     const [selectedMenuPoint, setSelectedMenuPoint] = useState(0);
   //  const navigate = useNavigate();
 
-  /*   const { isOpen, setIsOpen } = useDashboardContext();
+    const { isOpen, setIsOpen } = useDashboardContext();
 
     const handleClose = () => {
         setIsOpen(false);
     };
- */
+ 
     function handleMenuSelection(menuItem: number) {
         setSelectedMenuPoint(menuItem);
         /*  if (menuItem === 5) {
@@ -53,11 +52,19 @@ const TopMenuAdmin: React.FC = () => {
          } */
     }
 
+  
+
     const menuArray: MenuPoint[] = [];
 
      let newMenuPoint = {
         clickableText: "Stadepladser",
         component: AdminPlaces
+    }
+    menuArray.push(newMenuPoint)
+
+    newMenuPoint = {
+        clickableText: "Produkter",
+        component: AdminProducts
     }
     menuArray.push(newMenuPoint)
 
@@ -68,11 +75,7 @@ const TopMenuAdmin: React.FC = () => {
     menuArray.push(newMenuPoint)
 
 
-    newMenuPoint = {
-        clickableText: "Produkter",
-        component: AdminMenues
-    }
-    menuArray.push(newMenuPoint)
+    
 
     newMenuPoint = {
         clickableText: "Biler",
@@ -126,15 +129,15 @@ const TopMenuAdmin: React.FC = () => {
 
     return (
         <>
-            <div className="flex flex-col gap-60  bg-customBlue">
+            <div className="flex flex-col gap-60  bg-red-100">
                 <div className="flex">
                     {/* Column 1 */}
-                    <div className="flex-1  text-white p-4 text-center">
+                    <div className="flex-1  text-green-300 p-4 text-center">
                         <img src="/images/jjfisk_logo.svg" alt="Logo" height={100} width={100} />
                     </div>
 
                     {/* Column 2 with nested row */}
-                    <div className="flex-5 text-white p-4">
+                    <div className="flex-5 text-green-300 p-4">
                         <div className="grid grid-cols-10 gap-2 text-center">
                             {menuArray.map((menuPoint, index) => (
                                 <>

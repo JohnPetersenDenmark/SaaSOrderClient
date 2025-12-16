@@ -20,6 +20,9 @@
     "vite": "^7.2.4"
   },
   "dependencies": {
+    "@tiptap/extension-placeholder": "^3.13.0",
+    "@tiptap/react": "^3.13.0",
+    "@tiptap/starter-kit": "^3.13.0",
     "axios": "^1.13.2",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
