@@ -9,10 +9,19 @@ const TopMenuCustomers = () => {
     const navigate = useNavigate();
 
     function handleMenuSelection(menuItem: number) {
+
+        let selectedMenuItem = '';
         setSelectedMenuPoint(menuItem);
         if (menuItem === 5) {
-            navigate("/admin")
+           selectedMenuItem = 'admin'
         }
+
+        if (menuItem === 0) {
+            selectedMenuItem = ''
+        }
+
+        navigate("/" + selectedMenuItem) 
+
     }
 
     return (
@@ -22,7 +31,9 @@ const TopMenuCustomers = () => {
                     {/* Column 1 */}
                     <div className="flex-1  text-primaryTextColor p-4 text-center">
 
-                        <img src={config.branding.logo} alt="Logo" height={100} width={100} />
+                        <img src={config.branding.logo} alt="Logo" height={100} width={100} 
+                         onClick={() => handleMenuSelection(0)}
+                        />
                     </div>
 
                     {/* Column 2 with nested row */}
