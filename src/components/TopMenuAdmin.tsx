@@ -13,7 +13,7 @@ interface MenuPoint {
     menuId: string;
     clickableText: string;
     title: string;
-    columns: any[]; // The TanStack ColumnDef
+    columns: any[]; // The TanStack ColumnDef 
     data: any[];    // Your state or fetched data
     //   editComponent: React.ComponentType;
 }
