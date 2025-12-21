@@ -22,7 +22,7 @@ const AdminEmployee: React.FC = () => {
            const fetchData = async () => {
        
              try {
-               const employeesResponse: any = await get('/Admin/employeelist');
+               const employeesResponse = await get<Employee[]>('/Admin/employeelist');
        
                setEmployees(employeesResponse);
                setLoading(false);

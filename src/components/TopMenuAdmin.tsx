@@ -1,151 +1,139 @@
-import React, { useState } from 'react';
-import { useDashboardContext } from './admin/DashboardContext';
-import { useNavigate } from "react-router-dom";
-import { CurrentUser, useCurrentUser } from './CurrentUser';
+import React, { useState, useEffect } from 'react';
+import { AdminEntityView } from './admin/AdminEntityView';
+import { productColumns, employeeColumns } from './admin/AdminConfig';
+import { get } from "../core/api/axiosHttpClient";
+import type { Employee } from '../core/types/Employee';
+import type { Product } from '../core/types/Product';
 
-
-import AdminPlaces from '../pages/Administration/AdminPlaces';
-import AdminProducts from './admin/AdminProducts';
-import AdminFishshop from '../pages/Administration/AdminFishshop';
-import AdminProductCategories from '../pages/Administration/AdminProductCategories';
-import AdminProductTypes from '../pages/Administration/AdminProductTypes';
-import AdminEmployee from '../pages/Administration/AdminEmployee';
-import AdminOrders from '../pages/Administration/AdminOrders';
-import AdminProductLabels from '../pages/Administration/AdminProductLabels';
-import AdminUsers from '../pages/Administration/AdminUsers';
-import AdminOperatingArea from '../pages/Administration/AdminOperatingArea';
+//import AdminEmployee from '../pages/Administration/AdminEmployee';
+//import EmployeeCreateEdit from './admin/EmployeeCreateEdit';
 
 
 interface MenuPoint {
-    menuId: string
+    menuId: string;
     clickableText: string;
-    component: React.ComponentType; // points to actual component
+    title: string;
+    columns: any[]; // The TanStack ColumnDef
+    data: any[];    // Your state or fetched data
+    //   editComponent: React.ComponentType;
 }
 
 const TopMenuAdmin: React.FC = () => {
+    // 1. In a real app, you would fetch these from your context/API
+    const [products, setProducts] = useState([]);
+    const [employees, setEmployees] = useState<Employee[]>([]);
+    const [error, setError] = useState("");
 
-    const [selectedMenuPoint, setSelectedMenuPoint] = useState<MenuPoint>();
-   
-    function handleMenuSelection(menuPoint: MenuPoint) {        
-        setSelectedMenuPoint(menuPoint);              
-    }
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response: any = await get('/Home/productlist');
+                setProducts(response)
+            } catch {
+                setError('Failed to load products');
+            }
+        };
+        fetchProducts();
 
+        const fetchEmployees = async () => {
+            try {
+                const response  = await get<Employee[]>('/Admin/employeelist');
+                setEmployees(response)
+            } catch (err) {
+                setError('Failed to load employess');
+            }
+        };
+        fetchEmployees();
 
-    const menuArray: MenuPoint[] = [];
+    }, []);
 
-    let newMenuPoint = {
-        menuId: 'm1',
-        clickableText: "Stadepladser",
-        component: AdminPlaces
-    }
-    menuArray.push(newMenuPoint)
+    // 2. Define your menu items as data objects
+    const menuArray: MenuPoint[] = [
+        {
+            menuId: 'm1',
+            clickableText: "Produkter",
+            title: "Administrer Produkter",
+            columns: productColumns,
+            data: products,
+            //   editComponent : AdminEmployee
+        },
+        {
+            menuId: 'm2',
+            clickableText: "Medarbejdere",
+            title: "Administrer Medarbejdere",
+            columns: employeeColumns,
+            data: employees,
+            //    editComponent : EmployeeCreateEdit()
+        }
+    ];
 
-    newMenuPoint = {
-        menuId: 'm2',
-        clickableText: "Produkter",
-        component: AdminProducts
-    }
-    menuArray.push(newMenuPoint)
+    const [selectedMenu, setSelectedMenu] = useState<MenuPoint>(menuArray[0]);
 
-    newMenuPoint = {
-        menuId: 'm3',
-        clickableText: "Ordrer",
-        component: AdminOrders
-    }
-    menuArray.push(newMenuPoint)
+    // 3. Handlers for the buttons inside AdminEntityView
+    //  const handleEdit = (item: any) => console.log("Editing:", item);
 
-    newMenuPoint = {
-        menuId: 'm4',
-        clickableText: "Biler",
-        component: AdminFishshop
-    }
-    menuArray.push(newMenuPoint)
-
-
-    newMenuPoint = {
-        menuId: 'm5',
-        clickableText: "Produktmærkninger",
-        component: AdminProductLabels
-    }
-    menuArray.push(newMenuPoint)
-
-    newMenuPoint = {
-        menuId: 'm6',
-        clickableText: "Produktkategorier",
-        component: AdminProductCategories
-    }
-    menuArray.push(newMenuPoint)
-
-    newMenuPoint = {
-        menuId: 'm7',
-        clickableText: "Produkttyper",
-        component: AdminProductTypes
-    }
-    menuArray.push(newMenuPoint)
-
-    newMenuPoint = {
-        menuId: 'm8',
-        clickableText: "Medarbejdere",
-        component: AdminEmployee
-    }
-    menuArray.push(newMenuPoint)
-
-    newMenuPoint = {
-        menuId: 'm9',
-        clickableText: "Brugere",
-        component: AdminUsers
+    function handleEdit(item: any ) {
+       
+        if ( item.interfaceType === "Employee")
+        {
+            var x = 1;
+        }
+        
+        
 
     }
-    menuArray.push(newMenuPoint)
 
-    newMenuPoint = {
-        menuId: 'm10',
-        clickableText: "Områder",
-        component: AdminOperatingArea
+
+
+    function handleDelete(item: any) {
+        console.log("Deleting:", item);
     }
-    menuArray.push(newMenuPoint)
+
 
 
     return (
         <>
-            <div className="flex flex-col gap-60  bg-primaryBackgroundColor">
-                <div className="flex">
-                    {/* Column 1 */}
-                    <div className="flex-1  text-primaryTextColor p-4 text-center ">
-                        <img src="/images/jjfisk_logo.svg" alt="Logo" height={100} width={100}
-                        //  onClick={() => handleMenuSelection(0)}
-                        />
+            <div className="flex flex-col bg-primaryBackgroundColor">
+                <div className="flex items-center">
+                    <div className="flex-1 p-4">
+                        <img src="/images/jjfisk_logo.svg" alt="Logo" width={100} />
                     </div>
 
-                    {/* Column 2 with nested row */}
-                    <div className="flex-5 text-primaryTextColor p-4">
-                        <div className="grid grid-cols-10 gap-2 text-center ">
+                    <div className="flex-5 p-4">
+                        <div className="grid grid-cols-10 gap-2 text-center">
                             {menuArray.map((menuPoint) => (
-
-                                <div key={menuPoint.menuId}
-                                     className={`  cursor-pointer hover:text-hoverMenuActionsColor ${selectedMenuPoint?.component == menuPoint.component ? 'text-hoverMenuActionsColor' : 'text-primaryTextColor'}`}
-                                    onClick={() => handleMenuSelection(menuPoint)}
+                                <div
+                                    key={menuPoint.menuId}
+                                    className={`cursor-pointer hover:text-hoverMenuActionsColor ${selectedMenu.menuId === menuPoint.menuId
+                                        ? 'text-hoverMenuActionsColor font-bold'
+                                        : 'text-primaryTextColor'
+                                        }`}
+                                    onClick={() => setSelectedMenu(menuPoint)}
                                 >
                                     {menuPoint.clickableText}
                                 </div>
-
                             ))}
                         </div>
                     </div>
-
-                    {/* Column 3 */}
-                    <div className="flex-1 text-white p-4 text-center">
-
-                    </div>
+                    <div className="flex-1" />
                 </div>
-
             </div>
 
-            {selectedMenuPoint && React.createElement(selectedMenuPoint.component)}
-          
+            {/* 4. This one component now handles ALL 10 menu points */}
+            <div className="p-8">
+                <AdminEntityView
+                    title={selectedMenu.title}
+                    data={selectedMenu.data}
+                    columns={selectedMenu.columns}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                />
+            </div>
         </>
+    );
 
-    )
-}
+
+};
+
 
 export default TopMenuAdmin;

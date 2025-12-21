@@ -71,10 +71,22 @@ const getClient = (): AxiosInstance => {
   return axiosHttpClient;
 };
 
+export const get = <T>(url: string, params?: unknown): Promise<T> =>
+  getClient().get(url, { params });
+
+export const post = <T, B = unknown>(url: string, data?: B): Promise<T> =>
+  getClient().post(url, data);
+
+export const put = <T, B = unknown>(url: string, data?: B): Promise<T> =>
+  getClient().put(url, data);
+
+export const remove = <T>(url: string): Promise<T> =>
+  getClient().delete(url);
+
 /**
  * CRUD helper methods
  */
-export const get = (url: string, params?: any) => getClient().get(url, { params });
+/* export const get = (url: string, params?: any) => getClient().get(url, { params });
 export const post = (url: string, data?: any) => getClient().post(url, data);
 export const put = (url: string, data?: any) => getClient().put(url, data);
-export const remove = (url: string) => getClient().delete(url);
+export const remove = (url: string) => getClient().delete(url); */
