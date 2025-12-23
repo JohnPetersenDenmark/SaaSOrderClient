@@ -24,5 +24,6 @@ export interface Order {
     fishShopId : number,
     deliveryDate : string,
       templateSchedule : TemplateSchedule | undefined,
-     fishShop :  FishShopLightDto | undefined
+     fishShop :  FishShopLightDto | undefined 
+     
 }

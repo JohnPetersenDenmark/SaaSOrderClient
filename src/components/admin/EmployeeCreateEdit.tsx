@@ -6,7 +6,7 @@ import type { Employee } from '../../core/types/Employee';
 interface RegisterModalProps {
     isOpen: boolean;
     employeeToEdit: Employee | null;
-    onClose: () => void;
+     onClose: () => void;
 }
 
 const EmployeeCreateEdit: React.FC<RegisterModalProps> = ({ isOpen, employeeToEdit, onClose }) => {
@@ -214,7 +214,7 @@ const EmployeeCreateEdit: React.FC<RegisterModalProps> = ({ isOpen, employeeToEd
                     </div>
                     <div className="flex-1">
                         <button
-                            onClick={onClose}
+                             onClick={onClose}
                             disabled={submitting}
                             className="w-full px-4 py-2 rounded bg-white text-black hover:bg-gray-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
                         >

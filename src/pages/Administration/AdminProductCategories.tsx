@@ -53,7 +53,7 @@ const AdminProductCategories: React.FC = () => {
         try {
           setSubmitting(true);
 
-          await remove('/Admin/removeproductcategory/' + productCategory.id, true)
+          await remove('/Admin/removeproductcategory/' + productCategory.id)
 
 
         } catch (error) {

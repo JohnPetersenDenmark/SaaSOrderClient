@@ -71,6 +71,15 @@ const getClient = (): AxiosInstance => {
   return axiosHttpClient;
 };
 
+export const getWithKind = async <T, K extends string>(
+  url: string,
+  kind: K,
+  params?: unknown
+): Promise<(T & { kind: K })[]> => {
+  const data = await get<T[]>(url, params); // <-- uses get(), not getClient()
+  return data.map(item => ({ ...item, kind }));
+};
+
 export const get = <T>(url: string, params?: unknown): Promise<T> =>
   getClient().get(url, { params });
 

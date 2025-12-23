@@ -50,15 +50,17 @@ const FishShopCreateEdit: React.FC<RegisterModalProps> = ({ isOpen, fishShopToEd
         const fetchData = async () => {
             try {
                 setLoading(true);
-
+/* 
                 const [employeesResponse , operatingAreaResponse] = await Promise.all([
                     get('/Admin/employeelist'),
                     get('/Admin/operatingarealist')
                 ]);
+ */
+                const employeesResponse : any = await get('/Admin/employeelist')
+                setEmployeeList(employeesResponse);
 
-
-                setEmployeeList(employeesResponse.data);
-                setOperatingAreaList(operatingAreaResponse.data);
+                const operatingAreaResponse : any = await get('/Admin/operatingarealist')
+                setOperatingAreaList(operatingAreaResponse);
 
             } catch (err) {
                 setError("Failed to load data");
