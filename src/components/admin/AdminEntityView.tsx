@@ -7,7 +7,7 @@ interface AdminEntityViewProps<T> {
   title: string;
   data: T[];
   columns: ColumnDef<T>[]; // Requires @tanstack/react-table import
-  onEdit: (item: T) => void;
+  onEdit: (item: T | null) => void;
   onDelete: (item: T) => void;
 }
 
@@ -21,8 +21,6 @@ export function AdminEntityView<T extends { id: string | number }>({
 }: AdminEntityViewProps<T>) {
 
     
-
-   
   const tableColumns = useMemo<ColumnDef<T>[]>(() => [
     ...columns,
     {
@@ -49,9 +47,17 @@ export function AdminEntityView<T extends { id: string | number }>({
 
   return (
     <div className="p-4 bg-white rounded-lg shadow">
-      <h2 className="text-xl font-bold mb-4 text-primaryTextColor">{title}</h2>
-      {/* <AdminMenuTable title={title} onEdit= {onEdit} onDelete={onDelete} data={data} columns={tableColumns} /> */}
+      <h2 className="text-xl font-bold mb-4 text-primaryTextColor">{title}</h2>    
       <AdminMenuTable title={title} data={data} columns={tableColumns} />
+       <div>
+        <button 
+            onClick={() => onEdit(null)}
+            className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+          >
+            Tilføj
+          </button>
+        </div>  
     </div>
+    
   );
 }

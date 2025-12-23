@@ -5,7 +5,8 @@ import {
     productLabelColumns, locationColumns, shopColumns, areaColumns
 } from './admin/AdminConfig';
 
-import { get } from "../core/api/axiosHttpClient";
+import config from '../config';
+import { get, remove } from "../core/api/axiosHttpClient";
 import type { Employee } from '../core/types/Employee';
 import type { Product } from '../core/types/Product';
 
@@ -26,6 +27,7 @@ interface MenuPoint {
     title: string;
     columns: any[]; // The TanStack ColumnDef 
     data: any[];    // Your state or fetched data   
+    removeURL : string;
     kind: string
 }
 
@@ -178,6 +180,7 @@ const TopMenuAdmin: React.FC = () => {
             title: "Administrer Produkter",
             columns: productColumns,
             data: products,
+            removeURL : config.apiBaseUrl + "/Admin/removeproduct/",
             kind: "Product"
         },
         {
@@ -186,6 +189,7 @@ const TopMenuAdmin: React.FC = () => {
             title: "Administrer Ordrer",
             columns: orderColumns,
             data: orders,
+             removeURL : config.apiBaseUrl + "/Admin/removeorder/",
             kind: "Order"
         },
         {
@@ -194,6 +198,7 @@ const TopMenuAdmin: React.FC = () => {
             title: "Administrer Medarbejdere",
             columns: employeeColumns,
             data: employees,
+             removeURL : config.apiBaseUrl + "/Admin/removeemployee/",
             kind: "Employee"
         },
         {
@@ -202,7 +207,8 @@ const TopMenuAdmin: React.FC = () => {
             title: "Administrer Kategorier",
             columns: productCategoryColumns,
             data: productCategories,
-            kind: "ProductCategory"
+            kind: "ProductCategory",
+            removeURL : config.apiBaseUrl + "/Admin/removeproductcategory/"
         },
         {
             menuId: 'm5',
@@ -210,6 +216,7 @@ const TopMenuAdmin: React.FC = () => {
             title: "Administrer Produkttyper",
             columns: productTypeColumns,
             data: productTypes,
+             removeURL : config.apiBaseUrl + "/Admin/removeproducttype/",
             kind: "ProductType"
         },
         {
@@ -218,6 +225,7 @@ const TopMenuAdmin: React.FC = () => {
             title: "Administrer Produktmærkninger",
             columns: productLabelColumns,
             data: productLabels,
+             removeURL : config.apiBaseUrl + "/Admin/removeproductlabel/",
             kind: "ProductLabel"
         },
         {
@@ -226,6 +234,7 @@ const TopMenuAdmin: React.FC = () => {
             title: "Administrer lokationer",
             columns: locationColumns,
             data: saleLocations,
+             removeURL : config.apiBaseUrl + "/Admin/removelocation/",
             kind: "Location"
         },
         {
@@ -234,6 +243,7 @@ const TopMenuAdmin: React.FC = () => {
             title: "Administrer biler",
             columns: shopColumns,
             data: shops,
+             removeURL : config.apiBaseUrl + "/Admin/removefishshop/",
             kind: "Shop"
         },
         {
@@ -242,6 +252,7 @@ const TopMenuAdmin: React.FC = () => {
             title: "Administrer områder",
             columns: areaColumns,
             data: areas,
+             removeURL : config.apiBaseUrl + "/Admin/removeloperatingarea/",
             kind: "SalesArea"
         },
         {
@@ -250,6 +261,7 @@ const TopMenuAdmin: React.FC = () => {
             title: "Administrer brugere",
             columns: userColumns,
             data: users,
+             removeURL : config.apiBaseUrl + "/Login/removeuser/",
             kind: "User"
         }
     ];
@@ -261,19 +273,34 @@ const TopMenuAdmin: React.FC = () => {
     // 3. Handlers for the buttons inside AdminEntityView
     //  const handleEdit = (item: any) => console.log("Editing:", item);
 
-    function handleEdit(item: Employee | Product) {
+    function handleEdit(item: Employee | Product | null) {
 
         setSelectedKind(selectedMenu.kind)
         setSelectedEntity(item)
     }
 
+    const removeItem = async (item : any) => {
+        try {
+            const removeUrl = 
+            await remove(selectedMenu.removeURL + item.id)
+        } catch (error) {
+            setError('Fejl');
+            console.error(error);
+        } finally {
+
+        }
+    }
+
+
+    function handleDelete(item: any) {
+        removeItem(item);
+    }
+
+
     function handleSelectedMenu(menuPoint: MenuPoint) {
         setSelectedMenu(menuPoint);
     }
 
-    function handleDelete(item: any) {
-        console.log("Deleting:", item);
-    }
 
 
     const handleClose = () => {
@@ -311,13 +338,14 @@ const TopMenuAdmin: React.FC = () => {
 
             {/* 4. This one component now handles ALL 10 menu points */}
             <div className="p-8">
-                {selectedMenu.kind !== "Order" && <AdminEntityView
-                    title={selectedMenu.title}
-                    data={selectedMenu.data}
-                    columns={selectedMenu.columns}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                />}
+                {selectedMenu.kind !== "Order" &&
+                    <AdminEntityView
+                        title={selectedMenu.title}
+                        data={selectedMenu.data}
+                        columns={selectedMenu.columns}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />}
             </div>
 
             <div>

@@ -1,18 +1,9 @@
-import React, { useMemo } from 'react';
 import { 
   useReactTable, 
   getCoreRowModel, 
   flexRender, 
   type ColumnDef 
 } from '@tanstack/react-table';
-
-/* interface AdminEntityViewProps<T> {
-  title: string;
-  data: T[];
-  columns: ColumnDef<T>[];
-  onEdit: (item: T) => void;
-  onDelete: (item: T) => void;
-} */
 
 interface AdminEntityViewProps<T> {
   title: string;
@@ -27,21 +18,6 @@ export function AdminMenuTable<T extends { id: string | number }>({
   
 }: AdminEntityViewProps<T>) {
 
-  // 1. Add the Actions column dynamically
- /*  const tableColumns = useMemo<ColumnDef<T>[]>(() => [
-    ...columns,
-    {
-      id: 'actions',
-      header: 'Handlinger',
-      cell: ({ row }) => (
-        <div className="flex gap-2">
-          <button onClick={() => onEdit(row.original)} className="text-blue-600">Rediger</button>
-          <button onClick={() => onDelete(row.original)} className="text-red-600">Slet</button>
-        </div>
-      ),
-    }
-  ], [columns, onEdit, onDelete]); */
-
   // 2. Initialize the table logic
   const table = useReactTable({
     data,
@@ -52,6 +28,7 @@ export function AdminMenuTable<T extends { id: string | number }>({
 
   // 3. Render the UI (cannot just render {data})
   return (
+    <>
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">{title}</h2>
       <table className="w-full border-collapse">
@@ -77,7 +54,8 @@ export function AdminMenuTable<T extends { id: string | number }>({
             </tr>
           ))}
         </tbody>
-      </table>
-    </div>
+      </table>          
+    </div>   
+    </>
   );
 }
