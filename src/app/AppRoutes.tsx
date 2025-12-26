@@ -8,6 +8,7 @@ import TopMenuAdmin from "../components/TopMenuAdmin";
 import { CurrentUser } from "../components/CurrentUser";
 import { DashboardProvider } from "../components/admin/DashboardContext";
 import { ConfigProvider } from "../config";
+import Login from "../pages/Login";
 
 const AppRoutes = () => {
   const { features } = config;
@@ -22,6 +23,7 @@ const AppRoutes = () => {
               <Route path="/" element={<HomePage />} />
               <Route path="/createOrder" element={<CreateOrder />} />
               <Route path="/admin" element={<TopMenuAdmin />} />
+               <Route path="/login" element={<Login />} />
               {features.orders && (
                 <Route path="/orders" element={<OrdersPage />} />
               )}

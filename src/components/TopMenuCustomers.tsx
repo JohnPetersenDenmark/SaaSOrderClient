@@ -3,6 +3,8 @@ import {  useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
 
+
+
 const TopMenuCustomers = () => {
     const { config } = useConfig();
     const [selectedMenuPoint, setSelectedMenuPoint] = useState(0);
@@ -11,9 +13,16 @@ const TopMenuCustomers = () => {
     function handleMenuSelection(menuItem: number) {
 
         let selectedMenuItem = '';
+
         setSelectedMenuPoint(menuItem);
+
+
         if (menuItem === 5) {
            selectedMenuItem = 'admin'
+        }
+
+         if (menuItem === 6) {
+           selectedMenuItem = 'login'
         }
 
         if (menuItem === 0) {
@@ -70,8 +79,16 @@ const TopMenuCustomers = () => {
                             <div className="text-2xl p-2">
                                 <span
                                     onClick={() => handleMenuSelection(5)}
-                                    className={`cursor-pointer hover:text-hoverMenuActionsColor ${selectedMenuPoint == 4 ? 'text-hoverMenuActionsColor' : 'text-primaryTextColor'}`} >
+                                    className={`cursor-pointer hover:text-hoverMenuActionsColor ${selectedMenuPoint == 5 ? 'text-hoverMenuActionsColor' : 'text-primaryTextColor'}`} >
                                     ADMINISTRATION
+                                </span>
+                            </div>
+
+                             <div className="text-2xl p-2">
+                                <span
+                                    onClick={() => handleMenuSelection(6)}
+                                    className={`cursor-pointer hover:text-hoverMenuActionsColor ${selectedMenuPoint == 6 ? 'text-hoverMenuActionsColor' : 'text-primaryTextColor'}`} >
+                                    LOGIN
                                 </span>
                             </div>
                         </div>
