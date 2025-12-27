@@ -5,9 +5,13 @@ import type { MenuPoint } from './admin/AdminConfig';
 import AdminMenuPointEditComponent from './admin/AdminMenuPointEditComponent';
 import { get, remove } from "../core/api/axiosHttpClient";
 import AdminOrders from '../pages/Administration/AdminOrders';
-const TopMenuAdmin: React.FC = () => {
+import { CurrentUser, useCurrentUser } from './CurrentUser';
 
+const TopMenuAdmin: React.FC = () => {
     const [error, setError] = useState("");
+
+    const { user, authStatus, logout } = useCurrentUser();
+   const curUser = user;
 
    useEffect(() => {
     const load = async () => {
@@ -90,6 +94,9 @@ const TopMenuAdmin: React.FC = () => {
                 <div className="flex items-center">
                     <div className="flex-1 p-4">
                         <img src="/images/jjfisk_logo.svg" alt="Logo" width={100} />
+                    </div>
+                     <div className="flex-1 p-4 text-primaryTextColor">
+                        {curUser?.displayname}
                     </div>
 
                     <div className="flex-5 p-4">

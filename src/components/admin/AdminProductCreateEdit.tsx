@@ -5,13 +5,9 @@ import type { ProductCategory } from '../../core/types/ProducCategory';
 import type { ProductType } from '../../core/types/ProductType';
 import FileInput from './FileInput';
 import config from '../../config';
-//import RichtextEditorQuill from "../RichtextEditorQuill"
-
 import RichTextEditor from '../RichTextEditor';
-
-
-
-import { get , post } from "../../core/api/axiosHttpClient";
+import RichTextViewer from '../RichTextViewer';
+import { get, post } from "../../core/api/axiosHttpClient";
 import type { ProductLabel } from '../../core/types/ProductLabel';
 
 
@@ -93,7 +89,7 @@ const AdminProductCreateEdit: React.FC<ProductModalProps> = ({ isOpen, onClose, 
 
     const [editorHtml, setEditorHtml] = useState("");
 
- 
+
 
     const isProductNameValid = productName.length > 0;
     const isProductNumberValid = productNumber.length > 0;
@@ -286,10 +282,10 @@ const AdminProductCreateEdit: React.FC<ProductModalProps> = ({ isOpen, onClose, 
             weight: weight,
             shelfLife: shelflife,
             priceperkg: pricePerKilo,
-            productcategoryIds: selectedProductCategories ?  selectedProductCategories.map(cat => cat.id) : [],
+            productcategoryIds: selectedProductCategories ? selectedProductCategories.map(cat => cat.id) : [],
             producttypeids: selectedProductTypes ? selectedProductTypes.map(productType => productType.id) : [],
-           // productlabelids: selectedProductLabels && selectedProductLabels.map(productLabel => productLabel.id)
-           productlabelids: selectedProductLabels != null ? selectedProductLabels.map(productLabel => productLabel.id) : []
+            // productlabelids: selectedProductLabels && selectedProductLabels.map(productLabel => productLabel.id)
+            productlabelids: selectedProductLabels != null ? selectedProductLabels.map(productLabel => productLabel.id) : []
         }
 
         if (selectedFile) {
@@ -468,7 +464,7 @@ const AdminProductCreateEdit: React.FC<ProductModalProps> = ({ isOpen, onClose, 
 
     const handleRichTextEditorChange = (editorHtml: string) => {
         setProductDetails(editorHtml)
-        //setEditorHtml(editorHtml);
+        setEditorHtml(editorHtml);
     }
 
 
@@ -943,6 +939,9 @@ const AdminProductCreateEdit: React.FC<ProductModalProps> = ({ isOpen, onClose, 
                     />
                 </div>
 
+                <div style={{ marginTop: "1.5rem" }}>
+                    <RichTextViewer html={productDetails} />
+                </div>
 
 
                 <div className="flex gap-4 mt-10">
