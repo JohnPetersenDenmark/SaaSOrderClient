@@ -21,7 +21,7 @@ const fonts = [
   { name: "Mono", value: "Courier New" },
 ];
 
-const iconButtonSize = 40;
+const iconButtonSize = 30;
 const sizes = ["12px", "14px", "16px", "20px", "24px"];
 
 export const MenuBar = ({ editor }: MenuBarProps) => {

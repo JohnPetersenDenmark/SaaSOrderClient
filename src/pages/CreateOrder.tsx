@@ -116,7 +116,7 @@ export default function CreateOrder() {
                     productname: product.name,
                     imageurl: product.imageurl,
                     productdescription: product.description,
-                    details: '',
+                    details: product.details,
                     unitdiscountpercentage: product.discountpercentage,
                     discountedunitprice: product.discountprice,
                     unitprice: product.price,

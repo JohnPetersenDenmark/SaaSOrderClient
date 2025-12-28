@@ -1,5 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import config from '../../config';
+// import type { Product } from '../../core/types/Product';
 
 export interface MenuPoint {
     menuId: string;
@@ -12,15 +13,32 @@ export interface MenuPoint {
     kind: string    
 }
 
+export const productColumns: ColumnDef<any>[] = [  
+  {
+    accessorKey: "imageurl",
+    header: "Image",
+    cell: ({ getValue }) => {
+      const src = config.apiBaseUrl + getValue<string | undefined>();
+      if (!src) return null;
 
-export const productColumns: ColumnDef<any>[] = [
-
-    //product
-    { accessorKey: 'name', header: 'Produkt' },
-    { accessorKey: 'productnumber', header: 'Nr.' },
+      return (
+        <img
+          src={src}
+          alt=""
+          className="h-16 w-16 object-cover rounded"
+        />
+      );
+    },
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
+  },
+  { accessorKey: 'productnumber', header: 'Nr.' },
     { accessorKey: 'description', header: 'Beskrivelse' },
     { accessorKey: 'price', header: 'Pris' },
 ];
+
 
 // Employees
 export const employeeColumns: ColumnDef<any>[] = [
@@ -50,7 +68,23 @@ export const productTypeColumns: ColumnDef<any>[] = [
 
 // product label (mærkning)
 export const productLabelColumns: ColumnDef<any>[] = [
-    { accessorKey: 'id', header: 'Id' },
+    {
+    accessorKey: "imageurl",
+    header: "Image",
+    cell: ({ getValue }) => {
+      const src = config.apiBaseUrl + getValue<string | undefined>();
+      if (!src) return null;
+
+      return (
+        <img
+          src={src}
+          alt=""
+          className="h-16 w-16 object-cover rounded"
+        />
+      );
+    },
+  },
+  
     { accessorKey: 'labelname', header: 'Mærkning' },
     { accessorKey: 'imageurl', header: 'Image' },
 ];

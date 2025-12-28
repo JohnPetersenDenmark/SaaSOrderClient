@@ -14,17 +14,14 @@ export interface Product {
   discountpercentage: number;
   discountprice: number;
   producttype: number;
-
-  productcategories : ProductCategory[]
-   producttypes : ProductType[]
-
-     productLabels : ProductLabel[]
-
+  productcategories: ProductCategory[]
+  producttypes: ProductType[]
+  productLabels: ProductLabel[]
   badge: string,
   weight: string,
   shelflife: string,
   pricePerKg: string
 
-  
+
 
 }
