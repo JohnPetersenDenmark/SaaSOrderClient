@@ -1,4 +1,7 @@
 import { Editor } from "@tiptap/react";
+import { ModalSelectHTMLbits } from "./ModalSelectHTMLbits";
+import { useState } from "react";
+import type { htmlBit } from "./ModalSelectHTMLbits";
 
 import {
   Bold,
@@ -27,12 +30,58 @@ const sizes = ["12px", "14px", "16px", "20px", "24px"];
 export const MenuBar = ({ editor }: MenuBarProps) => {
   if (!editor) return null;
 
+  const [selectedHTMLbit, setSelectedHTMLbit] = useState<htmlBit | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+
   const resetStyles = () => {
     editor.chain().focus()
       .unsetAllMarks()
       .clearNodes()
       .run();
   };
+
+  function onClose() {
+    setSelectedHTMLbit(null);
+    setIsOpen(false);
+    return;
+  }
+
+ 
+  function onSelectedHTMLbit(selectedHTMLbitA: htmlBit) {
+    setSelectedHTMLbit(selectedHTMLbitA);   
+    setIsOpen(false);
+    return;
+  }
+
+  function insertHTMLclick(editor: Editor) {   
+    setIsOpen(true);
+  }
+
+  /* let htmlBitArray: htmlBit[] = [];
+
+  let htmlbit: htmlBit = {
+    name: "ball",
+    html: `
+            <div class="box">
+            <p class="bg-red">Hello from HTML</p>
+            <p><strong>Bold</strong> and <em>italic</em></p>
+            </div>
+          `
+  }
+
+  htmlBitArray.push(htmlbit);
+  htmlbit = {
+    name: "face",
+    html: `
+            <div class="box">
+            <p class="bg-red">Hello from HTML</p>
+            <p><strong>Bold</strong> and <em>italic</em></p>
+            </div>
+          `
+  }
+
+  htmlBitArray.push(htmlbit); */
+
 
   return (
     <div className="flex flex-wrap items-center gap-1 border-b pb-1 mb-2">
@@ -62,14 +111,25 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
       </IconButton>
 
       {/* Ordered list */}
-      <IconButton
+      {/*   <IconButton
         active={editor.isActive("orderedList")}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
       >
         <ListOrdered size={iconButtonSize} />
-      </IconButton>
+      </IconButton> */}
 
-      
+      <button
+        type="button"
+        onClick={() => insertHTMLclick(editor)}
+      >
+        Insert HTML Box
+      </button>
+
+      {isOpen && <ModalSelectHTMLbits open={true} onClose={onClose} onhandleSelected={onSelectedHTMLbit}  />}
+
+      {selectedHTMLbit && editor.chain().focus().insertContent(selectedHTMLbit.html).run()}
+
+
 
       <Divider />
 
@@ -98,7 +158,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
             }).run()
           }
           title={size}
-          
+
         >
           <span className="text-4xl">{size.replace("px", "")}</span>
         </IconButton>
@@ -117,6 +177,8 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
           }
         />
       </label>
+
+
 
       {/* Background color */}
       <label className="cursor-pointer">
@@ -160,12 +222,15 @@ const IconButton = ({ children, onClick, active, title }: IconButtonProps) => (
     type="button"
     title={title}
     onClick={onClick}
-    className={`p-1 rounded hover:bg-gray-200 ${active ? "bg-gray-300" : ""
+    className={`p - 1 rounded hover: bg - gray - 200 ${active ? "bg-gray-300" : ""
       }`}
   >
     {children}
   </button>
 );
+
+
+
 
 const Divider = () => (
   <span className="mx-1 h-4 w-px bg-gray-300" />

@@ -1,6 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 
-import Document from '@tiptap/extension-document'
 import StarterKit from "@tiptap/starter-kit";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
@@ -32,14 +31,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       StarterKit.configure({
         bulletList: false,
         orderedList: false,
-      }),
-      Document,
+      }),    
       TextStyle,
       FontSize,
       Color,
       BulletList,
       OrderedList,
-      ListItem,
+      ListItem,    
       Highlight.configure({ multicolor: true }),
       Placeholder.configure({
         placeholder: "Write something…",

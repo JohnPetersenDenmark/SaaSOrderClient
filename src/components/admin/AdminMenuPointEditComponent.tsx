@@ -8,6 +8,7 @@ import AdminProductLabelCreateEdit from './AdminProductLabelCreateEdit';
 import AdminPlaceCreateEdit from './AdminPlaceCreateEdit';
 import FishShopCreateEdit from './FishShopCreateEdit';
 import OperatingAreaCreateEdit from './OperatingAreaCreateEdit';
+import AdminHtmlSnippetCreateEdit from "./AdminHtmlSnippetCreateEdit";
 import RegisterUser from './RegisterUser';
 
 
@@ -19,9 +20,9 @@ export type EditorProps = {
 };
 
 
- const isOpen = true;
+const isOpen = true;
 
- 
+
 
 
 const AdminMenuPointEditComponent: React.FC<EditorProps> = ({ isOpen, onClose, entityToEdit, selectedMenuPoint }) => {
@@ -69,6 +70,10 @@ const AdminMenuPointEditComponent: React.FC<EditorProps> = ({ isOpen, onClose, e
 
         case "User":
             component = < RegisterUser isOpen={true} userToEdit={entityToEdit} onClose={onClose} />
+            break;
+
+        case "HtmlSnippet":
+            component = < AdminHtmlSnippetCreateEdit isOpen={true} htmlSnippetToEdit={entityToEdit} onClose={onClose} />
             break;
 
         default:

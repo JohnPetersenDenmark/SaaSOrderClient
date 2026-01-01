@@ -116,6 +116,12 @@ export const userColumns: ColumnDef<any>[] = [
     { accessorKey: 'displayname', header: 'Navn' }
 ];
 
+// HTML snippets
+export const htmlSnippetsColumns: ColumnDef<any>[] = [
+    { accessorKey: 'name', header: 'HTML snippet navn' },
+    { accessorKey: 'html', header: 'HTML' }
+];
+
 
 export const menuArray: MenuPoint[] = [
      {
@@ -219,6 +225,16 @@ export const menuArray: MenuPoint[] = [
         getDataURL: config.apiBaseUrl + "/Login/userlist",
         removeURL: config.apiBaseUrl + "/Login/removeuser/",
         kind: "User"
-    }  
+    },
+    {
+        menuId: 'm11',
+        clickableText: "HTML snippets",
+        title: "Administrer HTML snippets",
+        columns: htmlSnippetsColumns,
+        data: [],
+        getDataURL: config.apiBaseUrl + "/Home/htmlsnippetlist",
+        removeURL: config.apiBaseUrl + "/Admin/removehtmlsnippet/",
+        kind: "HtmlSnippet"
+    } 
 ] ; 
  
