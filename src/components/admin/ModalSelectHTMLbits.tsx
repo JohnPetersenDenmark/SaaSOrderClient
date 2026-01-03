@@ -1,38 +1,42 @@
 import { useState, useEffect } from "react";
-import { get  } from "../../core/api/axiosHttpClient";
+import { get } from "../../core/api/axiosHttpClient";
+import RichTextViewer from "../RichTextViewer";
 
 export interface htmlBit {
   name: string,
   html: string
+  id : string
 }
 
 type ModalProps = {
   open: boolean;
   onhandleSelected: (selectedHTMLbit: htmlBit) => void;
   onClose: () => void;
-  title?: string; 
+  title?: string;
 };
 
-export function ModalSelectHTMLbits({ open, onClose, title,  onhandleSelected }: ModalProps) {
+export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: ModalProps) {
 
   const [selectedHTMLbit, setSelectedHTMLbit] = useState<htmlBit>()
   const [htmlSnippets, setsetHtmlSnippets] = useState<any[]>([])
 
   useEffect(() => {
-      const fetchProducts = async () => {
-        try {
-          const response : any = await get('/Home/htmlsnippetlist');
-          setsetHtmlSnippets(response);
-        } catch {
-          //setError('Failed to load pizzas');
-        }
-      };
-  
-      
-  
-      fetchProducts();
-    
-    }, []);
+    const fetchProducts = async () => {
+      try {
+        const response: any = await get('/Home/htmlsnippetlist');
+        setsetHtmlSnippets(response);
+      } catch {
+        //setError('Failed to load pizzas');
+      }
+    };
+
+
+
+    fetchProducts();
+
+  }, []);
+
+ 
 
   if (!open) return null;
 
@@ -45,12 +49,18 @@ export function ModalSelectHTMLbits({ open, onClose, title,  onhandleSelected }:
           </div>
         )}
 
-        <div className="p-4 overflow-auto max-h-[90vh] bg-primaryBackgroundColor text-primaryTextColor">
-          {htmlSnippets.map((b: htmlBit) => (
-            <div
-            onClick={() => onhandleSelected (b)}
-            >{b.name}</div>
+        <div className="p-4 overflow-auto bg-primaryBackgroundColor text-secondaryTextColor">
+          {htmlSnippets.map((b: any) => (
+            <div>
+              <div className="bg-thirdBackgroundColor h-20 border border-gray-600"
+                onClick={() => onhandleSelected(b)}
+              >
+                {b.name}    <RichTextViewer html={b.html} />
+              </div>            
+            </div>
           ))}
+
+
         </div>
 
         <div className="px-4 py-3 border-t text-right bg-primaryBackgroundColor">

@@ -1,14 +1,8 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 
-import StarterKit from "@tiptap/starter-kit";
-import { TextStyle } from "@tiptap/extension-text-style";
-import Color from "@tiptap/extension-color";
-import Highlight from "@tiptap/extension-highlight";
-import Placeholder from "@tiptap/extension-placeholder";
-import { FontSize } from "@tiptap/extension-text-style";
-import BulletList from "@tiptap/extension-bullet-list";
-import OrderedList from "@tiptap/extension-ordered-list";
-import ListItem from "@tiptap/extension-list-item";
+import { tiptapExtensions } from "./RichTextEditorExtension";
+
+
 import { useEffect } from "react";
 
 import { MenuBar } from "./admin/MenuBar";
@@ -27,22 +21,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const editor = useEditor({
     editable: !readOnly,
-    extensions: [
-      StarterKit.configure({
-        bulletList: false,
-        orderedList: false,
-      }),    
-      TextStyle,
-      FontSize,
-      Color,
-      BulletList,
-      OrderedList,
-      ListItem,    
-      Highlight.configure({ multicolor: true }),
-      Placeholder.configure({
-        placeholder: "Write something…",
-      }),
-    ],
+    extensions: tiptapExtensions,
     content: value,
     onUpdate({ editor }) {
       onChange(editor.getHTML());
