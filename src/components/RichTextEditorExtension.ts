@@ -1,5 +1,6 @@
 import StarterKit from "@tiptap/starter-kit";
 import { TextStyle } from "@tiptap/extension-text-style";
+import FontFamily from '@tiptap/extension-font-family'
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -15,8 +16,9 @@ export const tiptapExtensions = [
   }),
 
   TextStyle, // ✅ named export
+  FontFamily,
   Color,
-FontSize,
+  FontSize,
   BulletList,
   OrderedList,
   ListItem,

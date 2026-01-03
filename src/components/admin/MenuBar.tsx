@@ -1,12 +1,11 @@
 import { Editor, } from "@tiptap/react";
 import { generateJSON } from "@tiptap/react";
 import { ModalSelectHTMLbits } from "./ModalSelectHTMLbits";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import type { htmlBit } from "./ModalSelectHTMLbits";
-import type { Selection as PMSelection } from '@tiptap/pm/state'
 
 import { tiptapExtensions } from "../RichTextEditorExtension";
-
+import { Star, StarHalf, FileCodeCorner, FileTypeCorner, ALargeSmall } from "lucide-react";
 
 
 import {
@@ -27,17 +26,17 @@ type MenuBarProps = {
 const fonts = [
   { name: "Arial", value: "Arial" },
   { name: "Serif", value: "Georgia" },
-  { name: "Mono", value: "Courier New" },
+  { name: 'Roboto', value: 'Roboto' }
 ];
 
 const iconButtonSize = 30;
-const sizes = ["12px", "14px", "16px", "20px", "24px"];
+const sizes = ["12px", "14px", "16px", "20px", "24px", "28px", "32px", "36px"];
 
 export const MenuBar = ({ editor }: MenuBarProps) => {
   if (!editor) return null;
- 
+
   const [isOpen, setIsOpen] = useState(false);
- 
+
   const resetStyles = () => {
     editor.chain().focus()
       .unsetAllMarks()
@@ -50,14 +49,22 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
     return;
   }
 
-  function onSelectedHTMLbit(selectedHTMLbitA: htmlBit) {
+  function setFont(fontValue: any) {
     setIsOpen(false);
-     const parsedContent = generateJSON(selectedHTMLbitA.html, tiptapExtensions)
-     editor?.chain().focus().setTextSelection( editor.state.selection).insertContent(parsedContent).run()
+    //let myFontType : string = font.value;
+    editor?.chain().focus().setFontFamily(fontValue).run()
+    // editor?.chain().focus().setFontFamily("Roboto").run()
     return;
   }
 
-  function insertHTMLclick(editor: Editor) { 
+  function onSelectedHTMLbit(selectedHTMLbitA: htmlBit) {
+    setIsOpen(false);
+    const parsedContent = generateJSON(selectedHTMLbitA.html, tiptapExtensions)
+    editor?.chain().focus().setTextSelection(editor.state.selection).insertContent(parsedContent).run()
+    return;
+  }
+
+  function insertHTMLclick(editor: Editor) {
     setIsOpen(true);
   }
 
@@ -72,6 +79,8 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
         <Bold size={iconButtonSize} />
       </IconButton>
 
+      <Divider />
+
       {/* Italic */}
       <IconButton
         active={editor.isActive("italic")}
@@ -79,6 +88,8 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
       >
         <Italic size={iconButtonSize} />
       </IconButton>
+
+      <Divider />
 
       {/* Bullet list */}
       <IconButton
@@ -88,6 +99,8 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
         <List size={iconButtonSize} />
       </IconButton>
 
+      <Divider />
+
       {/* Ordered list */}
       <IconButton
         active={editor.isActive("orderedList")}
@@ -96,47 +109,77 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
         <ListOrdered size={iconButtonSize} />
       </IconButton>
 
+      <Divider />
+
+      {/* Insert HTML snippet */}
       <button
         type="button"
         onClick={() => insertHTMLclick(editor)}
       >
-        Insert HTML Box
+        <FileCodeCorner size={iconButtonSize} />
       </button>
 
       {isOpen && <ModalSelectHTMLbits open={true} onClose={onClose} onhandleSelected={onSelectedHTMLbit} />}
 
       <Divider />
 
+      <FileTypeCorner size={iconButtonSize} />
       {/* Font family */}
       {fonts.map(font => (
         <IconButton
           key={font.value}
           onClick={() =>
-            editor.chain().focus().setMark("textStyle", {
-              fontFamily: font.value,
-            }).run()
+            setFont(font.value)
           }
           title={font.name}
         >
-          <Type size={iconButtonSize} />
+          {font.name}
         </IconButton>
       ))}
+
+      <Divider />
 
       {/* Font size */}
+      {/*   <ALargeSmall  size={iconButtonSize} /> 
       {sizes.map(size => (
-        <IconButton
-          key={size}
-          onClick={() =>
-            editor.chain().focus().setMark("textStyle", {
-              fontSize: size,
-            }).run()
-          }
-          title={size}
+        <>
+          
+          <IconButton
+            key={size}
+            onClick={() =>
+              editor.chain().focus().setMark("textStyle", {
+                fontSize: size,
+              }).run()
+            }
+            title={size}
 
-        >
-          <span className="text-4xl">{size.replace("px", "")}</span>
-        </IconButton>
-      ))}
+          >
+            <span className="text-4xl">{size.replace("px", "")}</span>
+             
+          </IconButton>
+        </>
+      ))} */}
+
+      <ALargeSmall size={iconButtonSize} />
+      <select
+        className="rounded border px-1 text-sm"
+        value={editor?.getAttributes('textStyle').fontSize ?? ''}
+        onChange={e =>
+          editor
+            ?.chain()
+            .focus()
+            .setMark('textStyle', { fontSize: e.target.value })
+            .run()
+        }
+      >
+        <option value="">Size</option>
+
+        {sizes.map(size => (
+          <option key={size} value={size}>
+            {size.replace('px', '')}
+          </option>
+        ))}
+      </select>
 
       <Divider />
 
@@ -152,7 +195,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
         />
       </label>
 
-
+ <Divider />
 
       {/* Background color */}
       <label className="cursor-pointer">
@@ -204,5 +247,5 @@ const IconButton = ({ children, onClick, active, title }: IconButtonProps) => (
 );
 
 const Divider = () => (
-  <span className="mx-1 h-4 w-px bg-gray-300" />
+  <span className="mx-3 h-10 w-px bg-gray-300" />
 );
