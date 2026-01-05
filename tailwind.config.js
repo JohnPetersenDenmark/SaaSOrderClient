@@ -4,19 +4,19 @@ export default {
   theme: {
     extend: {
       colors: {
-       primaryBackgroundColor: "var(--primary-background-color)",
+        primaryBackgroundColor: "var(--primary-background-color)",
         secondaryBackgroundColor: "var(--secondary-background-color)",
 
-         primaryTextColor: "var(--primary-text-color)",
+        primaryTextColor: "var(--primary-text-color)",
         secondaryTextColor: "var(--secondary-text-color)",
 
-        thirdBackgroundColor : "var(--third-background-color)",
+        thirdBackgroundColor: "var(--third-background-color)",
 
-        
-        hoverMenuActionsColor : "var(--hover-menuactions-color)",
- addToBasketHoverColor: "var(--addto-basket-color)",
-        
-       
+
+        hoverMenuActionsColor: "var(--hover-menuactions-color)",
+        addToBasketHoverColor: "var(--addto-basket-color)",
+
+
       },
     },
   },
