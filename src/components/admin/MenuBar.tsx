@@ -5,8 +5,7 @@ import { useState } from "react";
 import type { htmlBit } from "./ModalSelectHTMLbits";
 
 import { tiptapExtensions } from "../RichTextEditorExtension";
-import { Star, StarHalf, FileCodeCorner, FileTypeCorner, ALargeSmall } from "lucide-react";
-
+import {  FileCodeCorner, FileTypeCorner, ALargeSmall } from "lucide-react";
 
 import {
   Bold,
@@ -59,7 +58,9 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
 
   function onSelectedHTMLbit(selectedHTMLbitA: htmlBit) {
     setIsOpen(false);
-    const parsedContent = generateJSON(selectedHTMLbitA.html, tiptapExtensions)
+   // let htmlWithCheckBox = htmlToTaskList(selectedHTMLbitA.html)
+    let AhtmlToCheckmark = htmlToCheckmark(selectedHTMLbitA.html)
+    const parsedContent = generateJSON(AhtmlToCheckmark, tiptapExtensions)    
     editor?.chain().focus().setTextSelection(editor.state.selection).insertContent(parsedContent).run()
     return;
   }
@@ -249,3 +250,65 @@ const IconButton = ({ children, onClick, active, title }: IconButtonProps) => (
 const Divider = () => (
   <span className="mx-3 h-10 w-px bg-gray-300" />
 );
+
+/* function htmlToTaskList(html: string) {
+  // Create a temporary DOM parser
+  const container = document.createElement('div')
+  container.innerHTML = html
+
+  const ul = document.createElement('ul')
+  ul.setAttribute('data-type', 'taskList')
+
+  // Convert each input + label to a taskItem
+  container.querySelectorAll('input[type="checkbox"]').forEach(input => {
+    const li = document.createElement('li')
+    li.setAttribute('data-type', 'taskItem')
+    // li.setAttribute('data-checked', input.checked ? 'true' : 'false')
+     li.setAttribute('data-checked', true ? 'true' : 'false')
+    li.textContent = input.parentElement?.textContent?.trim() || ''
+    ul.appendChild(li)
+  })
+
+  return ul.outerHTML
+} */
+
+  function htmlToTaskList(html: string) {
+  const container = document.createElement('div')
+  container.innerHTML = html
+
+  const wrapper = document.createElement('div')
+
+  container.querySelectorAll('input[type="checkbox"]').forEach(el => {
+   // container.querySelectorAll('input').forEach(el => {
+    if (!(el instanceof HTMLInputElement)) return
+
+    const span = document.createElement('span')
+    span.setAttribute('data-checkbox', '')
+    span.setAttribute('data-checked', el.checked ? 'true' : 'false')
+
+    wrapper.appendChild(span)
+    wrapper.appendChild(document.createTextNode(' '))
+    wrapper.appendChild(
+      document.createTextNode(el.parentElement?.textContent?.trim() || '')
+    )
+  })
+
+  return wrapper.innerHTML
+}
+
+function htmlToCheckmark(html: string) {
+  const container = document.createElement('div')
+  container.innerHTML = html
+
+  return Array.from(
+    container.querySelectorAll('input[type="checkbox"]')
+  )
+    .map(el => {
+      if (!(el instanceof HTMLInputElement)) return ''
+      return `<span data-checkmark data-checked="${
+        el.checked ? 'true' : 'false'
+      }"></span>`
+    })
+    .join(' ')
+}
+

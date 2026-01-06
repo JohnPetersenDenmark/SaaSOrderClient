@@ -8,6 +8,10 @@ import BulletList from "@tiptap/extension-bullet-list";
 import OrderedList from "@tiptap/extension-ordered-list";
 import ListItem from "@tiptap/extension-list-item";
 import { FontSize } from "@tiptap/extension-text-style";
+import { Checkmark } from "./Checkmark";
+
+import TaskList from '@tiptap/extension-task-list'
+import TaskItem from '@tiptap/extension-task-item'
 
 export const tiptapExtensions = [
   StarterKit.configure({
@@ -17,6 +21,9 @@ export const tiptapExtensions = [
 
   TextStyle, // ✅ named export
   FontFamily,
+  TaskList,
+  TaskItem,
+  Checkmark,
   Color,
   FontSize,
   BulletList,
