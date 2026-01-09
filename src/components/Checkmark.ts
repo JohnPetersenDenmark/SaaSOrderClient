@@ -37,7 +37,7 @@ export const Checkmark = Node.create({
         'data-checkmark': '',
         class: checked
           ? 'text-green-600 font-bold'
-          : 'text-red-600 font-bold',
+          : 'text-hoverMenuActionsColor font-bold',
       }),
       checked ? '✔' : '✖',
     ]

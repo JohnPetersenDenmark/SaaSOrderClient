@@ -1,11 +1,11 @@
 import { Editor, } from "@tiptap/react";
-import { generateJSON } from "@tiptap/react";
 import { ModalSelectHTMLbits } from "./ModalSelectHTMLbits";
 import { useState } from "react";
 import type { htmlBit } from "./ModalSelectHTMLbits";
+import { UnicodeIconPicker } from "../UnicodeIconPicker";
 
-import { tiptapExtensions } from "../RichTextEditorExtension";
-import {  FileCodeCorner, FileTypeCorner, ALargeSmall } from "lucide-react";
+
+import { FileCodeCorner, FileTypeCorner, ALargeSmall } from "lucide-react";
 
 import {
   Bold,
@@ -18,8 +18,15 @@ import {
   RotateCcw,
 } from "lucide-react";
 
+type editorImageTag = {
+  src: string,
+  alt: string
+}
+
+
+
 type MenuBarProps = {
-  editor: Editor | null;
+  editor: Editor
 };
 
 const fonts = [
@@ -35,6 +42,10 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
   if (!editor) return null;
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isIconPickerOpen, setIconPickerOpen] = useState(false);
+
+
+  const [isRangeSelected, setIsRangeSelected] = useState(false);
 
   const resetStyles = () => {
     editor.chain().focus()
@@ -56,13 +67,12 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
     return;
   }
 
-  function onSelectedHTMLbit(selectedHTMLbitA: htmlBit) {
+  function onSelectedHTMLbit(userSelectedHTMLbit: htmlBit) {
     setIsOpen(false);
-   // let htmlWithCheckBox = htmlToTaskList(selectedHTMLbitA.html)
-    let AhtmlToCheckmark = htmlToCheckmark(selectedHTMLbitA.html)
-    const parsedContent = generateJSON(AhtmlToCheckmark, tiptapExtensions)    
-    editor?.chain().focus().setTextSelection(editor.state.selection).insertContent(parsedContent).run()
-    return;
+
+    findHtmlSnippetHTMLtag(userSelectedHTMLbit.html, editor)
+
+    return ("");
   }
 
   function insertHTMLclick(editor: Editor) {
@@ -111,6 +121,44 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
       </IconButton>
 
       <Divider />
+
+      {/*  <button onClick={() => editor.commands.setRating(4)}>
+        Give 2 stars
+      </button> */}
+
+      {/*    {!isRangeSelected && <select
+        onChange={e =>
+          editor.commands.setRating(Number(e.target.value))
+        }
+      >
+        <option value="1">★</option>
+        <option value="2">★★</option>
+        <option value="3">★★★</option>
+        <option value="4">★★★★</option>
+        <option value="5">★★★★★</option>
+      </select>
+      } */}
+
+      <select onChange={(e) => editor.commands.setRating(Number(e.target.value))}>
+        <option value="1">1 ★</option>
+        <option value="2">2 ★★</option>
+        <option value="3">3 ★★★</option>
+        <option value="4">4 ★★★★</option>
+        <option value="5">5 ★★★★★</option>
+      </select>
+
+      <button
+        type="button"
+        onClick={() => setIconPickerOpen(true)}
+      >
+        Ikoner
+      </button>
+
+      {isIconPickerOpen && <UnicodeIconPicker
+        editor={editor}
+        onClose={() => setIconPickerOpen(false)}
+      />
+      }
 
       {/* Insert HTML snippet */}
       <button
@@ -196,7 +244,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
         />
       </label>
 
- <Divider />
+      <Divider />
 
       {/* Background color */}
       <label className="cursor-pointer">
@@ -272,43 +320,153 @@ const Divider = () => (
   return ul.outerHTML
 } */
 
-  function htmlToTaskList(html: string) {
-  const container = document.createElement('div')
-  container.innerHTML = html
+/* function htmlToTaskList(html: string) {
+const container = document.createElement('div')
+container.innerHTML = html
 
-  const wrapper = document.createElement('div')
+const wrapper = document.createElement('div')
 
-  container.querySelectorAll('input[type="checkbox"]').forEach(el => {
-   // container.querySelectorAll('input').forEach(el => {
-    if (!(el instanceof HTMLInputElement)) return
+container.querySelectorAll('input[type="checkbox"]').forEach(el => {
+ // container.querySelectorAll('input').forEach(el => {
+  if (!(el instanceof HTMLInputElement)) return
 
-    const span = document.createElement('span')
-    span.setAttribute('data-checkbox', '')
-    span.setAttribute('data-checked', el.checked ? 'true' : 'false')
+  const span = document.createElement('span')
+  span.setAttribute('data-checkbox', '')
+  span.setAttribute('data-checked', el.checked ? 'true' : 'false')
 
-    wrapper.appendChild(span)
-    wrapper.appendChild(document.createTextNode(' '))
-    wrapper.appendChild(
-      document.createTextNode(el.parentElement?.textContent?.trim() || '')
-    )
-  })
+  wrapper.appendChild(span)
+  wrapper.appendChild(document.createTextNode(' '))
+  wrapper.appendChild(
+    document.createTextNode(el.parentElement?.textContent?.trim() || '')
+  )
+})
 
-  return wrapper.innerHTML
-}
+return wrapper.innerHTML
+} */
 
-function htmlToCheckmark(html: string) {
-  const container = document.createElement('div')
-  container.innerHTML = html
+function htmlToCheckmark(nodeList: NodeListOf<Element>, editor?: Editor) {
 
-  return Array.from(
-    container.querySelectorAll('input[type="checkbox"]')
+  const xy = Array.from(
+    nodeList
   )
     .map(el => {
       if (!(el instanceof HTMLInputElement)) return ''
-      return `<span data-checkmark data-checked="${
-        el.checked ? 'true' : 'false'
-      }"></span>`
+      return `<span data-checkmark data-checked="${el.checked ? 'true' : 'false'
+        }"></span>`
     })
     .join(' ')
+
+
+  //editor?.chain().focus().insertContent(xy).run()
+
+  return (xy);
 }
+
+function htmlImageToEditorImage(imageNode: HTMLImageElement, editor?: Editor): any {
+
+  let node: any;
+
+  if (imageNode !== null) {
+
+
+    if (imageNode.src !== null || imageNode.src !== undefined) {
+      node = {
+        src: imageNode.getAttribute('src'),
+        alt: 'Example image',
+      }
+    }
+  }
+
+  // editor?.chain().focus().setImage(node).run()
+  return node;
+}
+
+function findHtmlSnippetHTMLtag(html: string, editor: Editor) {
+  const container = document.createElement('div')
+  container.innerHTML = html
+
+  const nodesToInsert: any[] = []
+
+  // ✅ Supported: Images
+  const imageNode = container.querySelector<HTMLImageElement>('img')
+  if (imageNode) {
+    nodesToInsert.push({
+      type: 'image',
+      attrs: {
+        src: imageNode.src,
+        alt: imageNode.alt || '',
+      },
+    })
+    imageNode.remove() // remove from container to avoid double-processing
+  }
+
+  // ✅ Supported: Checkboxes → Checkmark nodes
+  const checkBoxNodeList = container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')
+  checkBoxNodeList.forEach(input => {
+    nodesToInsert.push({
+      type: 'checkmark',
+      attrs: { checked: input.checked },
+    })
+    input.remove()
+  })
+
+  const ratingNodes = container.querySelectorAll('[data-rating]')
+
+  ratingNodes.forEach(el => {
+    nodesToInsert.push({
+      type: 'rating',
+      attrs: {
+        value: Number(el.getAttribute('data-value') || 0),
+        max: Number(el.getAttribute('data-max') || 5)
+      },
+      //content: [{ type: 'text', text: el.textContent || '' }]
+    })
+    el.remove()
+  })
+
+  const iconSpans = container.querySelectorAll('span[data-icon]')
+  iconSpans.forEach(span => {
+    const svg = span.querySelector('svg')
+    if (svg) {
+      const pathEl = svg.querySelector('path')
+      if (!pathEl) return
+
+      nodesToInsert.push({
+        type: 'icon',
+        attrs: {
+          name: span.getAttribute('data-icon') || '',
+          color: '#000000',
+          size: 20,
+          path: pathEl.getAttribute('d') || '', // <-- important: get "d" attribute
+        },
+      })
+
+      span.remove()
+    }
+  })
+
+  // ✅ Supported: <mark> highlights
+  container.querySelectorAll('mark').forEach(markEl => {
+    nodesToInsert.push({
+      type: 'highlight',
+      attrs: { color: markEl.getAttribute('data-color') || 'yellow' },
+      content: [{ type: 'text', text: markEl.textContent || '' }],
+    })
+    markEl.remove()
+  })
+
+  // ✅ Remaining unsupported content → wrap as rawHTML
+  if (container.innerHTML.trim()) {
+    nodesToInsert.push({
+      type: 'rawHTML',
+      attrs: { html: container.innerHTML },
+    })
+  }
+
+  // ✅ Insert everything at once
+  if (nodesToInsert.length > 0) {
+    editor?.chain().focus().insertContent(nodesToInsert).run()
+  }
+}
+
 

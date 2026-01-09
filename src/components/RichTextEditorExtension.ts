@@ -9,6 +9,11 @@ import OrderedList from "@tiptap/extension-ordered-list";
 import ListItem from "@tiptap/extension-list-item";
 import { FontSize } from "@tiptap/extension-text-style";
 import { Checkmark } from "./Checkmark";
+import { RawHTML } from "./RawHTML";
+import Image from '@tiptap/extension-image'
+import { Rating } from "./Rating";
+import { RatingUserSelection } from "./RatingUserSelection";
+import { SvgIconTipTapExtension } from "./SvgIconTipTapExtension";
 
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
@@ -24,7 +29,12 @@ export const tiptapExtensions = [
   TaskList,
   TaskItem,
   Checkmark,
+  RawHTML,
+  Rating,
+  RatingUserSelection,
+  SvgIconTipTapExtension,
   Color,
+  Image,
   FontSize,
   BulletList,
   OrderedList,
