@@ -1,35 +1,33 @@
-import { Node, mergeAttributes } from '@tiptap/core'
+import { Node } from '@tiptap/core'
 
 export const SvgIconTipTapExtension = Node.create({
-  name: 'icon',
+  name: 'svgicon',
   inline: true,
   group: 'inline',
-  atom: false,
+  atom: true,
 
   addAttributes() {
     return {
-      name: { default: 'star' },
-      color: { default: '#000' },
-      size: { default: 20 },
-      path: { default: '' },
+      svg: {
+        default: '',
+      },
     }
   },
 
-  renderHTML({ HTMLAttributes }) {
-    const { name, color, size, path } = HTMLAttributes
-
+  parseHTML() {
     return [
-      'span',
-      mergeAttributes({ 'data-icon': name }),
-      [
-        'svg',
-        { width: size, height: size, viewBox: '0 0 24 24' },
-        ['path', { fill: color, d: path }]
-      ],
+      { tag: 'svg' },
     ]
   },
 
-  parseHTML() {
-    return [{ tag: 'span[data-icon]' }]
+  renderHTML({ node }) {
+    // node.attrs.svg already contains full <svg>…</svg>
+    return {
+      dom: (() => {
+        const wrapper = document.createElement('span')
+        wrapper.innerHTML = node.attrs.svg
+        return wrapper.firstElementChild as HTMLElement
+      })(),
+    }
   },
 })

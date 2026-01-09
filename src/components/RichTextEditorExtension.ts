@@ -32,7 +32,7 @@ export const tiptapExtensions = [
   RawHTML,
   Rating,
   RatingUserSelection,
-  SvgIconTipTapExtension,
+   SvgIconTipTapExtension,
   Color,
   Image,
   FontSize,

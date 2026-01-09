@@ -23,7 +23,7 @@ type editorImageTag = {
   alt: string
 }
 
-
+const testSvgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 36 36"><path fill="#C60C30" d="M32 5H15v11h21V9a4 4 0 0 0-4-4zM15 31h17c2.209 0 4-1.791 4-4.5V20H15v11zM0 20v6.5C0 29.209 1.791 31 4 31h7V20H0zM11 5H4a4 4 0 0 0-4 4v7h11V5z"></path><path fill="#EEE" d="M15 5h-4v11H0v4h11v11h4V20h21v-4H15z"></path></svg>`
 
 type MenuBarProps = {
   editor: Editor
@@ -44,6 +44,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isIconPickerOpen, setIconPickerOpen] = useState(false);
 
+  const [count, setCount] = useState(0);
 
   const [isRangeSelected, setIsRangeSelected] = useState(false);
 
@@ -72,6 +73,8 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
 
     findHtmlSnippetHTMLtag(userSelectedHTMLbit.html, editor)
 
+    const tmpCount: number = count + 1
+    setCount(tmpCount)
     return ("");
   }
 
@@ -424,7 +427,7 @@ function findHtmlSnippetHTMLtag(html: string, editor: Editor) {
     el.remove()
   })
 
-  const iconSpans = container.querySelectorAll('span[data-icon]')
+  /* const iconSpans = container.querySelectorAll('span[data-icon]')
   iconSpans.forEach(span => {
     const svg = span.querySelector('svg')
     if (svg) {
@@ -443,6 +446,23 @@ function findHtmlSnippetHTMLtag(html: string, editor: Editor) {
 
       span.remove()
     }
+  }) */
+
+  const svgNodes = container.querySelectorAll('svg')
+
+  svgNodes.forEach(svg => {
+    // Store entire SVG markup as a string
+    const svgMarkup = svg.outerHTML    
+     nodesToInsert.push({
+      type: 'svgicon',
+      attrs: {   
+        svg : svgMarkup
+      },
+    }) 
+
+     // Remove the svg from the temporary container
+    svg.remove()
+   
   })
 
   // ✅ Supported: <mark> highlights
@@ -458,15 +478,19 @@ function findHtmlSnippetHTMLtag(html: string, editor: Editor) {
   // ✅ Remaining unsupported content → wrap as rawHTML
   if (container.innerHTML.trim()) {
     nodesToInsert.push({
-      type: 'rawHTML',
+      type: 'RawHTML',
       attrs: { html: container.innerHTML },
     })
   }
 
-  // ✅ Insert everything at once
+  // ✅ Insert everything at once 
   if (nodesToInsert.length > 0) {
-    editor?.chain().focus().insertContent(nodesToInsert).run()
+     editor?.chain().focus().insertContent(nodesToInsert).run()
+     // editor?.chain().focus().insertContent(testSvgIcon).run()
+    
   }
+
+
 }
 
 
