@@ -3,8 +3,6 @@ import { ModalSelectHTMLbits } from "./ModalSelectHTMLbits";
 import { useState } from "react";
 import type { htmlBit } from "./ModalSelectHTMLbits";
 import { UnicodeIconPicker } from "../UnicodeIconPicker";
-
-
 import { FileCodeCorner, FileTypeCorner, ALargeSmall } from "lucide-react";
 
 import {
@@ -18,12 +16,6 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-type editorImageTag = {
-  src: string,
-  alt: string
-}
-
-const testSvgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 36 36"><path fill="#C60C30" d="M32 5H15v11h21V9a4 4 0 0 0-4-4zM15 31h17c2.209 0 4-1.791 4-4.5V20H15v11zM0 20v6.5C0 29.209 1.791 31 4 31h7V20H0zM11 5H4a4 4 0 0 0-4 4v7h11V5z"></path><path fill="#EEE" d="M15 5h-4v11H0v4h11v11h4V20h21v-4H15z"></path></svg>`
 
 type MenuBarProps = {
   editor: Editor
@@ -44,10 +36,8 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isIconPickerOpen, setIconPickerOpen] = useState(false);
 
-  const [count, setCount] = useState(0);
-
-  const [isRangeSelected, setIsRangeSelected] = useState(false);
-
+  const [svgTagFound, setSvgTagFound] = useState(false);
+  
   const resetStyles = () => {
     editor.chain().focus()
       .unsetAllMarks()
@@ -73,8 +63,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
 
     findHtmlSnippetHTMLtag(userSelectedHTMLbit.html, editor)
 
-    const tmpCount: number = count + 1
-    setCount(tmpCount)
+   
     return ("");
   }
 
@@ -124,24 +113,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
       </IconButton>
 
       <Divider />
-
-      {/*  <button onClick={() => editor.commands.setRating(4)}>
-        Give 2 stars
-      </button> */}
-
-      {/*    {!isRangeSelected && <select
-        onChange={e =>
-          editor.commands.setRating(Number(e.target.value))
-        }
-      >
-        <option value="1">★</option>
-        <option value="2">★★</option>
-        <option value="3">★★★</option>
-        <option value="4">★★★★</option>
-        <option value="5">★★★★★</option>
-      </select>
-      } */}
-
+    
       <select onChange={(e) => editor.commands.setRating(Number(e.target.value))}>
         <option value="1">1 ★</option>
         <option value="2">2 ★★</option>
@@ -190,28 +162,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
       ))}
 
       <Divider />
-
-      {/* Font size */}
-      {/*   <ALargeSmall  size={iconButtonSize} /> 
-      {sizes.map(size => (
-        <>
-          
-          <IconButton
-            key={size}
-            onClick={() =>
-              editor.chain().focus().setMark("textStyle", {
-                fontSize: size,
-              }).run()
-            }
-            title={size}
-
-          >
-            <span className="text-4xl">{size.replace("px", "")}</span>
-             
-          </IconButton>
-        </>
-      ))} */}
-
+      
       <ALargeSmall size={iconButtonSize} />
       <select
         className="rounded border px-1 text-sm"
@@ -302,87 +253,6 @@ const Divider = () => (
   <span className="mx-3 h-10 w-px bg-gray-300" />
 );
 
-/* function htmlToTaskList(html: string) {
-  // Create a temporary DOM parser
-  const container = document.createElement('div')
-  container.innerHTML = html
-
-  const ul = document.createElement('ul')
-  ul.setAttribute('data-type', 'taskList')
-
-  // Convert each input + label to a taskItem
-  container.querySelectorAll('input[type="checkbox"]').forEach(input => {
-    const li = document.createElement('li')
-    li.setAttribute('data-type', 'taskItem')
-    // li.setAttribute('data-checked', input.checked ? 'true' : 'false')
-     li.setAttribute('data-checked', true ? 'true' : 'false')
-    li.textContent = input.parentElement?.textContent?.trim() || ''
-    ul.appendChild(li)
-  })
-
-  return ul.outerHTML
-} */
-
-/* function htmlToTaskList(html: string) {
-const container = document.createElement('div')
-container.innerHTML = html
-
-const wrapper = document.createElement('div')
-
-container.querySelectorAll('input[type="checkbox"]').forEach(el => {
- // container.querySelectorAll('input').forEach(el => {
-  if (!(el instanceof HTMLInputElement)) return
-
-  const span = document.createElement('span')
-  span.setAttribute('data-checkbox', '')
-  span.setAttribute('data-checked', el.checked ? 'true' : 'false')
-
-  wrapper.appendChild(span)
-  wrapper.appendChild(document.createTextNode(' '))
-  wrapper.appendChild(
-    document.createTextNode(el.parentElement?.textContent?.trim() || '')
-  )
-})
-
-return wrapper.innerHTML
-} */
-
-function htmlToCheckmark(nodeList: NodeListOf<Element>, editor?: Editor) {
-
-  const xy = Array.from(
-    nodeList
-  )
-    .map(el => {
-      if (!(el instanceof HTMLInputElement)) return ''
-      return `<span data-checkmark data-checked="${el.checked ? 'true' : 'false'
-        }"></span>`
-    })
-    .join(' ')
-
-
-  //editor?.chain().focus().insertContent(xy).run()
-
-  return (xy);
-}
-
-function htmlImageToEditorImage(imageNode: HTMLImageElement, editor?: Editor): any {
-
-  let node: any;
-
-  if (imageNode !== null) {
-
-
-    if (imageNode.src !== null || imageNode.src !== undefined) {
-      node = {
-        src: imageNode.getAttribute('src'),
-        alt: 'Example image',
-      }
-    }
-  }
-
-  // editor?.chain().focus().setImage(node).run()
-  return node;
-}
 
 function findHtmlSnippetHTMLtag(html: string, editor: Editor) {
   const container = document.createElement('div')
@@ -427,31 +297,10 @@ function findHtmlSnippetHTMLtag(html: string, editor: Editor) {
     el.remove()
   })
 
-  /* const iconSpans = container.querySelectorAll('span[data-icon]')
-  iconSpans.forEach(span => {
-    const svg = span.querySelector('svg')
-    if (svg) {
-      const pathEl = svg.querySelector('path')
-      if (!pathEl) return
-
-      nodesToInsert.push({
-        type: 'icon',
-        attrs: {
-          name: span.getAttribute('data-icon') || '',
-          color: '#000000',
-          size: 20,
-          path: pathEl.getAttribute('d') || '', // <-- important: get "d" attribute
-        },
-      })
-
-      span.remove()
-    }
-  }) */
-
   const svgNodes = container.querySelectorAll('svg')
-
   svgNodes.forEach(svg => {
     // Store entire SVG markup as a string
+
     const svgMarkup = svg.outerHTML    
      nodesToInsert.push({
       type: 'svgicon',
@@ -489,7 +338,6 @@ function findHtmlSnippetHTMLtag(html: string, editor: Editor) {
      // editor?.chain().focus().insertContent(testSvgIcon).run()
     
   }
-
 
 }
 
