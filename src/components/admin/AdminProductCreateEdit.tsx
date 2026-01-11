@@ -936,6 +936,7 @@ const AdminProductCreateEdit: React.FC<ProductModalProps> = ({ isOpen, onClose, 
                     <RichTextEditor
                         value={productDetails}
                         onChange={(html) => handleRichTextEditorChange(html)}
+                        readOnly={false}
                     />
                 </div>
 

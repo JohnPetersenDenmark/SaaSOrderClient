@@ -39,28 +39,18 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
   }, []);
 
 
-  function handleClose() 
-  {
+  function handleClose() {
     if (svgSelected) {
       let tmpString = svgSelected?.html
 
       const parser = new DOMParser();
       if (tmpString) {
         const doc = parser.parseFromString(tmpString, "image/svg+xml");
-
-
         const svg = doc.documentElement;
-
-        // read
-
-        //  const height = svg.getAttribute("height");
-
-        // change
 
         svg.setAttribute("height", svgSelectedHeight);
         svg.setAttribute("width", svgSelectedWidth);
 
-        // back to string
         const updatedSvgString = svg.outerHTML;
 
         let NewHtmlSnippet: htmlBit =
@@ -77,18 +67,42 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
     }
   }
 
-    function handleSelectedHtmlSnippet(selectedHTMLbit: htmlBit) {
-      let y = selectedHTMLbit.html
-      if (selectedHTMLbit.html.indexOf('<svg') > -1) {
-        setSvgSelected(selectedHTMLbit)
+  function handleSelectedHtmlSnippet(selectedHTMLbit: htmlBit) {
+    let y = selectedHTMLbit.html
+    if (selectedHTMLbit.html.indexOf('<svg') > -1) {
+      setSvgSelected(selectedHTMLbit)
+
+      let tmpString = selectedHTMLbit?.html
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(tmpString, "image/svg+xml");
+      const svg = doc.documentElement;
+
+      let height = svg.getAttribute("height");
+      height ? setSvgSelectedHeight(height) : setSvgSelectedHeight("0")
+
+      let width = svg.getAttribute("width");
+      width ? setSvgSelectedWidth(width) : setSvgSelectedWidth("0")
+
+      if (!height || !width) {
+        let viewBox = svg.getAttribute("viewBox");
+        if (viewBox) {
+          let viewBoxOptions = viewBox.split(' ')
+          height = viewBoxOptions[3]
+          height ? setSvgSelectedHeight(height) : setSvgSelectedHeight("0")
+          
+           width = viewBoxOptions[2]
+          width ? setSvgSelectedWidth(width) : setSvgSelectedWidth("0")
+        }
       }
-    }
 
-    function handleWidthSizeChanged(svgWidthSize: string) {
-      setSvgSelectedWidth(svgWidthSize)
     }
+  }
 
-  
+  function handleWidthSizeChanged(svgWidthSize: string) {
+    setSvgSelectedWidth(svgWidthSize)
+  }
+
+
 
   function handleHeightSizeChanged(svgHeightSize: string) {
     setSvgSelectedHeight(svgHeightSize)
