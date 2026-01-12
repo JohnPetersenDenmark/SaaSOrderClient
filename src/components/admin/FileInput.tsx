@@ -1,4 +1,5 @@
-import React, { useRef, useState, ChangeEvent } from "react";
+import React, { useRef, useState } from "react";
+import type {  ChangeEvent } from "react";
 import "./FileInput.css";
 
 interface FileInputProps {

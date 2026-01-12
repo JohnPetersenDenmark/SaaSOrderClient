@@ -37,7 +37,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
   const [isIconPickerOpen, setIconPickerOpen] = useState(false);
 
   const [svgTagFound, setSvgTagFound] = useState(false);
-  
+
   const resetStyles = () => {
     editor.chain().focus()
       .unsetAllMarks()
@@ -58,12 +58,15 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
     return;
   }
 
-  function onSelectedHTMLbit(userSelectedHTMLbit: htmlBit) {
+  function onSelectedHTMLbit(userSelectedHTMLbit: htmlBit | null) {
     setIsOpen(false);
 
-    findHtmlSnippetHTMLtag(userSelectedHTMLbit.html, editor)
+    if (userSelectedHTMLbit) {
+      findHtmlSnippetHTMLtag(userSelectedHTMLbit.html, editor)
+    }
 
-   
+
+
     return ("");
   }
 
@@ -113,7 +116,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
       </IconButton>
 
       <Divider />
-    
+
       <select onChange={(e) => editor.commands.setRating(Number(e.target.value))}>
         <option value="1">1 ★</option>
         <option value="2">2 ★★</option>
@@ -162,7 +165,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
       ))}
 
       <Divider />
-      
+
       <ALargeSmall size={iconButtonSize} />
       <select
         className="rounded border px-1 text-sm"
@@ -301,17 +304,17 @@ function findHtmlSnippetHTMLtag(html: string, editor: Editor) {
   svgNodes.forEach(svg => {
     // Store entire SVG markup as a string
 
-    const svgMarkup = svg.outerHTML    
-     nodesToInsert.push({
+    const svgMarkup = svg.outerHTML
+    nodesToInsert.push({
       type: 'svgicon',
-      attrs: {   
-        svg : svgMarkup
+      attrs: {
+        svg: svgMarkup
       },
-    }) 
+    })
 
-     // Remove the svg from the temporary container
+    // Remove the svg from the temporary container
     svg.remove()
-   
+
   })
 
   // ✅ Supported: <mark> highlights
@@ -334,9 +337,9 @@ function findHtmlSnippetHTMLtag(html: string, editor: Editor) {
 
   // ✅ Insert everything at once 
   if (nodesToInsert.length > 0) {
-     editor?.chain().focus().insertContent(nodesToInsert).run()
-     // editor?.chain().focus().insertContent(testSvgIcon).run()
-    
+    editor?.chain().focus().insertContent(nodesToInsert).run()
+    // editor?.chain().focus().insertContent(testSvgIcon).run()
+
   }
 
 }

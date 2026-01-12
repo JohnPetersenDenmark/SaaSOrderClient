@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { get } from "../../core/api/axiosHttpClient";
 import RichTextViewer from "../RichTextViewer";
+import ColorPicker from "../ColorPicker";
 
 
 export interface htmlBit {
@@ -11,7 +12,7 @@ export interface htmlBit {
 
 type ModalProps = {
   open: boolean;
-  onhandleSelected: (selectedHTMLbit: htmlBit) => void;
+  onhandleSelected: (selectedHTMLbit: htmlBit | null) => void;
   onClose: () => void;
   title?: string;
 };
@@ -20,9 +21,13 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
 
   const [htmlSnippets, setsetHtmlSnippets] = useState<any[]>([])
 
+   const [htmlSnippetSelected, setHtmlSnippetSelected] = useState<htmlBit | null>(null);
+
   const [svgSelected, setSvgSelected] = useState<htmlBit | null>(null);
   const [svgSelectedWidth, setSvgSelectedWidth] = useState("0")
   const [svgSelectedHeight, setSvgSelectedHeight] = useState("0")
+
+  const [color, setColor] = useState<string>("#aabbcc");
 
 
   useEffect(() => {
@@ -51,6 +56,13 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
         svg.setAttribute("height", svgSelectedHeight);
         svg.setAttribute("width", svgSelectedWidth);
 
+        let PathNode = svg.querySelector('path')
+        if ( PathNode)
+        {
+          let currentColor = PathNode.getAttribute('fill')
+          PathNode.setAttribute('fill', color)
+        }
+
         const updatedSvgString = svg.outerHTML;
 
         let NewHtmlSnippet: htmlBit =
@@ -62,13 +74,28 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
 
 
         onhandleSelected(NewHtmlSnippet)
-      }
-      //onClose()
+        return;
+      }     
     }
+
+    onhandleSelected(htmlSnippetSelected )
+  }
+
+  function onhandleSelectedColor(hexColorValue : string)
+  {
+    if ( !svgSelected)
+    {
+      return;
+    }
+     setColor(hexColorValue)
   }
 
   function handleSelectedHtmlSnippet(selectedHTMLbit: htmlBit) {
+
+    setHtmlSnippetSelected(selectedHTMLbit)
+
     let y = selectedHTMLbit.html
+
     if (selectedHTMLbit.html.indexOf('<svg') > -1) {
       setSvgSelected(selectedHTMLbit)
 
@@ -89,8 +116,8 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
           let viewBoxOptions = viewBox.split(' ')
           height = viewBoxOptions[3]
           height ? setSvgSelectedHeight(height) : setSvgSelectedHeight("0")
-          
-           width = viewBoxOptions[2]
+
+          width = viewBoxOptions[2]
           width ? setSvgSelectedWidth(width) : setSvgSelectedWidth("0")
         }
       }
@@ -173,6 +200,11 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
                     borderRadius: "4px",
                   }}
                 />
+              </div>
+              <div style={{ padding: "1rem" }}>
+                {svgSelected && 
+                <ColorPicker onhandleSelected={onhandleSelectedColor}/>}
+                <p>Selected color: {color}</p>
               </div>
             </div>
           ))}
