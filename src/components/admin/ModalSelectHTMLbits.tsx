@@ -21,13 +21,13 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
 
   const [htmlSnippets, setsetHtmlSnippets] = useState<any[]>([])
 
-   const [htmlSnippetSelected, setHtmlSnippetSelected] = useState<htmlBit | null>(null);
+  const [htmlSnippetSelected, setHtmlSnippetSelected] = useState<htmlBit | null>(null);
 
   const [svgSelected, setSvgSelected] = useState<htmlBit | null>(null);
   const [svgSelectedWidth, setSvgSelectedWidth] = useState("0")
   const [svgSelectedHeight, setSvgSelectedHeight] = useState("0")
 
-  const [color, setColor] = useState<string>("#aabbcc");
+  const [color, setColor] = useState<string>("");
 
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
 
   function handleClose() {
     if (svgSelected) {
-      let tmpString = svgSelected?.html
+   /*    let tmpString = svgSelected?.html
 
       const parser = new DOMParser();
       if (tmpString) {
@@ -57,8 +57,7 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
         svg.setAttribute("width", svgSelectedWidth);
 
         let PathNode = svg.querySelector('path')
-        if ( PathNode)
-        {
+        if (PathNode) {
           let currentColor = PathNode.getAttribute('fill')
           PathNode.setAttribute('fill', color)
         }
@@ -75,20 +74,16 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
 
         onhandleSelected(NewHtmlSnippet)
         return;
-      }     
+      } */
+
+        onhandleSelected(svgSelected)
+        return;
     }
 
-    onhandleSelected(htmlSnippetSelected )
+    onhandleSelected(htmlSnippetSelected)
   }
 
-  function onhandleSelectedColor(hexColorValue : string)
-  {
-    if ( !svgSelected)
-    {
-      return;
-    }
-     setColor(hexColorValue)
-  }
+
 
   function handleSelectedHtmlSnippet(selectedHTMLbit: htmlBit) {
 
@@ -122,19 +117,66 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
         }
       }
 
+      let PathNode = svg.querySelector('path')
+      if (PathNode) {
+        let currentColor = PathNode.getAttribute('fill')
+        if (currentColor) {
+          setColor(currentColor)
+        }
+      }
+    }
+    else {
+      setSvgSelected(null)
     }
   }
 
-  function handleWidthSizeChanged(svgWidthSize: string) {
-    setSvgSelectedWidth(svgWidthSize)
+  function setAttributesOnSelectedSvg(svgHeight : string, svgWidth : string, svgColor : string) {
+    let svgHtml = svgSelected?.html
+
+    if (svgHtml) {
+      const parser = new DOMParser();
+
+      const doc = parser.parseFromString(svgHtml, "image/svg+xml");
+      const svg = doc.documentElement;
+       svg.setAttribute("height", svgHeight);
+        svg.setAttribute("width", svgWidth);
+
+        let PathNode = svg.querySelector('path')
+        if (PathNode) {
+          PathNode.setAttribute('fill', svgColor)
+        }
+
+        let NewHtmlSnippet: htmlBit =
+        {
+          name: svgSelected ? svgSelected.name : '',
+          id: svgSelected ? svgSelected.id : '',
+          html: svg.outerHTML
+        }
+
+        setSvgSelected(NewHtmlSnippet)
+    }
+
+
   }
 
+    function handleWidthSizeChanged(svgWidthSize: string) {
+    setSvgSelectedWidth(svgWidthSize)
 
+    setAttributesOnSelectedSvg(svgSelectedHeight, svgWidthSize, color)
+  }
 
   function handleHeightSizeChanged(svgHeightSize: string) {
     setSvgSelectedHeight(svgHeightSize)
+    setAttributesOnSelectedSvg(svgHeightSize, svgSelectedWidth, color)
   }
 
+  function onhandleSelectedColor(hexColorValue: string) {
+    if (!svgSelected) {
+      return;
+    }
+    setColor(hexColorValue)
+    setAttributesOnSelectedSvg(svgSelectedHeight, svgSelectedWidth, hexColorValue)
+  }
 
 
 
@@ -142,8 +184,8 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[80vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" >
+      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full  max-h-[80vh]">
         {title && (
           <div className="px-4 py-3 border-b font-semibold">
             {title}
@@ -162,51 +204,79 @@ export function ModalSelectHTMLbits({ open, onClose, title, onhandleSelected }: 
 
         <div className="p-4 bg-primaryBackgroundColor text-secondaryTextColor max-h-[60vh] overflow-y-auto">
           {htmlSnippets.map((b: any) => (
-            <div key={b.id}>
+            // <div key={b.id}>
+            <>
               <div
-                className="bg-thirdBackgroundColor h-48 border border-gray-600"
+                className="ml-5 bg-thirdBackgroundColor  h-48 border border-gray-600 overflow-y-auto"
                 onClick={() => handleSelectedHtmlSnippet(b)}
               >
-                {b.name} <RichTextViewer html={b.html} />
+                <div className="ml-5" >
+                  {b.name}
+                </div>
 
-                <label htmlFor="svgwidthsize">Width:</label>
-                <input
-                  id="svgwidthsize"
-                  type="text"
-                  value={svgSelectedWidth}
-                  onChange={(e) => handleWidthSizeChanged(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "0.5rem",
-                    marginTop: "0.25rem",
-                    borderWidth: "1.5px",
-                    borderStyle: "solid",
-                    borderRadius: "4px",
-                  }}
-                />
+                {
+                  svgSelected && htmlSnippetSelected && b.id === htmlSnippetSelected.id
+                    ?
+                    <RichTextViewer html={svgSelected.html} />
+                    :
+                    <RichTextViewer html={b.html} />
+                }
 
-                <label htmlFor="svgheightsize">Height:</label>
-                <input
-                  id="svgwidthsize"
-                  type="text"
-                  value={svgSelectedHeight}
-                  onChange={(e) => handleHeightSizeChanged(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "0.5rem",
-                    marginTop: "0.25rem",
-                    borderWidth: "1.5px",
-                    borderStyle: "solid",
-                    borderRadius: "4px",
-                  }}
-                />
               </div>
-              <div style={{ padding: "1rem" }}>
-                {svgSelected && 
-                <ColorPicker onhandleSelected={onhandleSelectedColor}/>}
-                <p>Selected color: {color}</p>
-              </div>
-            </div>
+
+              {svgSelected && htmlSnippetSelected && b.id === htmlSnippetSelected.id &&
+
+                <div
+                  className="ml-5 bg-thirdBackgroundColor h-48 border border-gray-600"
+                // onClick={() => handleSelectedHtmlSnippet(b)}
+                >
+
+                  <div className="ml-5 mr-5">
+
+                    <label htmlFor="svgwidthsize">Width:</label>
+                    <input
+                      id="svgwidthsize"
+                      type="text"
+                      value={svgSelectedWidth}
+                      onChange={(e) => handleWidthSizeChanged(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "0.5rem",
+                        marginTop: "0.25rem",
+                        borderWidth: "1.5px",
+                        borderStyle: "solid",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  </div>
+
+                  <div className="ml-5 mr-5">
+                    <label htmlFor="svgheightsize">Height:</label>
+                    <input
+                      id="svgwidthsize"
+                      type="text"
+                      value={svgSelectedHeight}
+                      onChange={(e) => handleHeightSizeChanged(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "0.5rem",
+                        marginTop: "0.25rem",
+                        borderWidth: "1.5px",
+                        borderStyle: "solid",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  </div>
+
+                  <div className="ml-0  bg-thirdBackgroundColor">
+                    <div className="mt-5 ml-52 bg-thirdBackgroundColor">
+                      <ColorPicker defaultColor={color} onhandleSelected={onhandleSelectedColor} />
+                    </div>
+                  </div>
+
+                </div>
+              }
+            </>
           ))}
         </div>
 
