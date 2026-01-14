@@ -21,11 +21,11 @@ type MenuBarProps = {
   editor: Editor
 };
 
-const fonts = [
+/* const fonts = [
   { name: "Arial", value: "Arial" },
   { name: "Serif", value: "Georgia" },
   { name: 'Roboto', value: 'Roboto' }
-];
+]; */
 
 const iconButtonSize = 30;
 const sizes = ["12px", "14px", "16px", "20px", "24px", "28px", "32px", "36px"];
@@ -38,6 +38,41 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
 
   const [svgTagFound, setSvgTagFound] = useState(false);
 
+  const [fontSelectOpen, setFontSelectOpen] = useState(false);
+
+  const [lineHeightSelectOpen, setLineHeightSelectOpen] = useState(false);
+
+  const [fontSizeSelectOpen, setFontSizeSelectOpen] = useState(false);
+
+
+
+
+
+
+  const increaseIndent = (editor: any) => {
+    if (!editor) return
+
+    const current = editor.getAttributes('paragraph').indent ?? 0
+
+    editor
+      .chain()
+      .updateAttributes('paragraph', { indent: current + 1 })
+      .focus()
+      .run()
+  }
+
+  const decreaseIndent = (editor: any) => {
+    if (!editor) return
+
+    const current = editor.getAttributes('paragraph').indent ?? 0
+
+    editor
+      .chain()
+      .updateAttributes('paragraph', { indent: Math.max(0, current - 1) })
+      .focus()
+      .run()
+  }
+
   const resetStyles = () => {
     editor.chain().focus()
       .unsetAllMarks()
@@ -49,6 +84,24 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
     setIsOpen(false);
     return;
   }
+
+  function setLineHeight(lineHeight: string) {
+    editor.chain().focus().setNode('paragraph', { lineHeight: lineHeight }).run()
+  }
+
+  function toggleFontTypeSelectionOpen() {
+    fontSelectOpen ? setFontSelectOpen(false) : setFontSelectOpen(true)
+  }
+
+  function toggleFontLineHeightSelectionOpen() {
+    lineHeightSelectOpen ? setLineHeightSelectOpen(false) : setLineHeightSelectOpen(true)
+  }
+
+  function toggleFontFontSizeSelectionOpen() {
+    fontSizeSelectOpen ? setFontSizeSelectOpen(false) : setFontSizeSelectOpen(true)
+  }
+
+
 
   function setFont(fontValue: any) {
     setIsOpen(false);
@@ -76,6 +129,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
 
   return (
     <div className="flex flex-wrap items-center gap-1 border-b pb-1 mb-2">
+
 
       {/* Bold */}
       <IconButton
@@ -117,19 +171,39 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
 
       <Divider />
 
-      <select onChange={(e) => editor.commands.setRating(Number(e.target.value))}>
+      <button onClick={() => increaseIndent(editor)}>
+        <img src="/images/IndentLeft.svg" alt="Logo" height={iconButtonSize} width={iconButtonSize} />
+      </button>
+
+      <button onClick={() => decreaseIndent(editor)}>
+        <img src="/images/outdentLeft.svg" alt="Logo" height={iconButtonSize} width={iconButtonSize} />
+      </button>
+
+      <Divider />
+
+      {/* Ordered list */}
+      <IconButton
+        active={editor.isActive("orderedList")}
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+      >
+        <ListOrdered size={iconButtonSize} />
+      </IconButton>
+
+      <Divider />
+
+      {/* <select onChange={(e) => editor.commands.setRating(Number(e.target.value))}>
         <option value="1">1 ★</option>
         <option value="2">2 ★★</option>
         <option value="3">3 ★★★</option>
         <option value="4">4 ★★★★</option>
         <option value="5">5 ★★★★★</option>
-      </select>
+      </select> */}
 
       <button
         type="button"
         onClick={() => setIconPickerOpen(true)}
       >
-        Ikoner
+        <img src="/images/Icons.svg" alt="Logo" height={iconButtonSize} width={iconButtonSize} />
       </button>
 
       {isIconPickerOpen && <UnicodeIconPicker
@@ -137,7 +211,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
         onClose={() => setIconPickerOpen(false)}
       />
       }
-
+      <Divider />
       {/* Insert HTML snippet */}
       <button
         type="button"
@@ -150,66 +224,58 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
 
       <Divider />
 
-      <FileTypeCorner size={iconButtonSize} />
-      {/* Font family */}
-      {fonts.map(font => (
-        <IconButton
-          key={font.value}
-          onClick={() =>
-            setFont(font.value)
-          }
-          title={font.name}
-        >
-          {font.name}
-        </IconButton>
-      ))}
+      <div onClick={toggleFontTypeSelectionOpen}>
+        <FileTypeCorner size={iconButtonSize} />
+      </div>
+
+      {fontSelectOpen ? <select onChange={(e) => setFont(e.target.value)}>
+        <option value="Arial">Arial</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Roboto">Roboto</option>
+      </select> : ''}
+
+
 
       <Divider />
 
-      <button onClick={() =>
-        editor.chain().focus().setNode('paragraph', { lineHeight: '1' }).run()
-      }>
-        Enkelt (1.0)
-      </button>
+      <div onClick={toggleFontLineHeightSelectionOpen}>
+        <img src="/images/LineHeight.svg" alt="Logo" height={iconButtonSize} width={iconButtonSize} />
+      </div>
 
-      <button onClick={() =>
-        editor.chain().focus().setNode('paragraph', { lineHeight: '1.5' }).run()
-      }>
-        1.5 linjeafstand
-      </button>
+      {lineHeightSelectOpen ? <select onChange={(e) => setLineHeight(e.target.value)}>
+        <option value="1.0">1.0</option>
+        <option value="1.5">1.5</option>
+        <option value="2.0">2.0</option>
+        <option value="3.0">3.0</option>
+        <option value="4.0">4.0</option>
+      </select> : ''}
 
-      <button onClick={() =>
-        editor.chain().focus().setNode('paragraph', { lineHeight: '2' }).run()
-      }>
-        Dobbelt (2.0)
-      </button>
 
-      <button onClick={() =>
-        editor.chain().focus().setNode('paragraph', { lineHeight: '8' }).run()
-      }>
-        Dobbelt (4.0)
-      </button>
+      <Divider />
 
-      <ALargeSmall size={iconButtonSize} />
-      <select
-        className="rounded border px-1 text-sm"
-        value={editor?.getAttributes('textStyle').fontSize ?? ''}
-        onChange={e =>
-          editor
-            ?.chain()
-            .focus()
-            .setMark('textStyle', { fontSize: e.target.value })
-            .run()
-        }
-      >
-        <option value="">Size</option>
+      <div onClick={toggleFontFontSizeSelectionOpen}>
+        <img src="/images/FontSize.svg" alt="Logo" height={iconButtonSize} width={iconButtonSize} />
+      </div>
+      {fontSizeSelectOpen ?
+        <select
+          className="rounded border px-1 text-sm"
+          value={editor?.getAttributes('textStyle').fontSize ?? ''}
+          onChange={e =>
+            editor
+              ?.chain()
+              .focus()
+              .setMark('textStyle', { fontSize: e.target.value })
+              .run()
+          }
+        >
+          <option value="">Size</option>
 
-        {sizes.map(size => (
-          <option key={size} value={size}>
-            {size.replace('px', '')}
-          </option>
-        ))}
-      </select>
+          {sizes.map(size => (
+            <option key={size} value={size}>
+              {size.replace('px', '')}
+            </option>
+          ))}
+        </select> : ''}
 
       <Divider />
 
@@ -340,10 +406,6 @@ function findHtmlSnippetHTMLtag(html: string, editor: Editor) {
 
     svg.remove
   })
-
-
-
-
 
   // ✅ Supported: <mark> highlights
   container.querySelectorAll('mark').forEach(markEl => {

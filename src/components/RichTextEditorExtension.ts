@@ -14,6 +14,7 @@ import Image from '@tiptap/extension-image'
 import { Rating } from "./Rating";
 import { RatingUserSelection } from "./RatingUserSelection";
 import { SvgIconTipTapExtension } from "./SvgIconTipTapExtension";
+import { IndentableParagraph } from "./IndentableParagraph";
 
 
 import ParagraphWithLineHeight from "./ParagraphWithLineHeight";
@@ -37,6 +38,7 @@ export const tiptapExtensions = [
   Rating,
   RatingUserSelection,
   SvgIconTipTapExtension,
+  IndentableParagraph,
   Color,
   Image,
   FontSize,
