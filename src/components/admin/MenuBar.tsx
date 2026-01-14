@@ -1,4 +1,4 @@
-import { Editor, } from "@tiptap/react";
+import { Editor, type Content, } from "@tiptap/react";
 import { ModalSelectHTMLbits } from "./ModalSelectHTMLbits";
 import { useState } from "react";
 import type { htmlBit } from "./ModalSelectHTMLbits";
@@ -166,6 +166,30 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
 
       <Divider />
 
+      <button onClick={() =>
+        editor.chain().focus().setNode('paragraph', { lineHeight: '1' }).run()
+      }>
+        Enkelt (1.0)
+      </button>
+
+      <button onClick={() =>
+        editor.chain().focus().setNode('paragraph', { lineHeight: '1.5' }).run()
+      }>
+        1.5 linjeafstand
+      </button>
+
+      <button onClick={() =>
+        editor.chain().focus().setNode('paragraph', { lineHeight: '2' }).run()
+      }>
+        Dobbelt (2.0)
+      </button>
+
+      <button onClick={() =>
+        editor.chain().focus().setNode('paragraph', { lineHeight: '8' }).run()
+      }>
+        Dobbelt (4.0)
+      </button>
+
       <ALargeSmall size={iconButtonSize} />
       <select
         className="rounded border px-1 text-sm"
@@ -302,20 +326,24 @@ function findHtmlSnippetHTMLtag(html: string, editor: Editor) {
 
   const svgNodes = container.querySelectorAll('svg')
   svgNodes.forEach(svg => {
-    // Store entire SVG markup as a string
 
-    const svgMarkup = svg.outerHTML
-    nodesToInsert.push({
-      type: 'svgicon',
-      attrs: {
-        svg: svgMarkup
+    editor.chain().focus().insertContent([
+      {
+        type: 'svgicon',
+        attrs: { svg: svg.outerHTML },
       },
-    })
+      {
+        type: 'text',
+        text: ' ',        // space → caret anchor
+      },
+    ]).run()
 
-    // Remove the svg from the temporary container
-    svg.remove()
-
+    svg.remove
   })
+
+
+
+
 
   // ✅ Supported: <mark> highlights
   container.querySelectorAll('mark').forEach(markEl => {

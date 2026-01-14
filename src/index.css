@@ -47,3 +47,12 @@
 .prose p {
   margin: 0.5rem 0;
 }
+
+span[data-svgicon] {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+span[data-svgicon] svg {
+  display: inline;
+}

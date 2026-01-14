@@ -15,6 +15,9 @@ import { Rating } from "./Rating";
 import { RatingUserSelection } from "./RatingUserSelection";
 import { SvgIconTipTapExtension } from "./SvgIconTipTapExtension";
 
+
+import ParagraphWithLineHeight from "./ParagraphWithLineHeight";
+
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 
@@ -22,6 +25,7 @@ export const tiptapExtensions = [
   StarterKit.configure({
     bulletList: false,
     orderedList: false,
+    paragraph: false,
   }),
 
   TextStyle, // ✅ named export
@@ -32,10 +36,11 @@ export const tiptapExtensions = [
   RawHTML,
   Rating,
   RatingUserSelection,
-   SvgIconTipTapExtension,
+  SvgIconTipTapExtension,
   Color,
   Image,
   FontSize,
+  ParagraphWithLineHeight,
   BulletList,
   OrderedList,
   ListItem,

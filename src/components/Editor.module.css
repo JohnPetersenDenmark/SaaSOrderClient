@@ -1,0 +1,8 @@
+span[data-svgicon] {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+span[data-svgicon] svg {
+  display: inline;
+}
