@@ -21,14 +21,38 @@ type MenuBarProps = {
   editor: Editor
 };
 
-/* const fonts = [
-  { name: "Arial", value: "Arial" },
-  { name: "Serif", value: "Georgia" },
-  { name: 'Roboto', value: 'Roboto' }
-]; */
+const fonts = [
+  { label: "Arial", value: "Arial" },
+  { label: "Serif", value: "Georgia" },
+  { label: 'Roboto', value: 'Roboto' }
+];
+
+const lineHeightoptions = [
+  { value: "1.0", label: "1.0" },
+  { value: "1.5", label: "1.5" },
+  { value: "2.0", label: "2.0" },
+  { value: "2.5", label: "2.5" },
+  { value: "3.0", label: "3.0" },
+  { value: "4.0", label: "4.0" },
+  { value: "5.0", label: "5.0" },
+]
 
 const iconButtonSize = 30;
-const sizes = ["12px", "14px", "16px", "20px", "24px", "28px", "32px", "36px"];
+const sizes = [
+  { value: "8px", label: "8px" },
+  { value: "10px", label: "10px" },
+  { value: "11px", label: "11px" },
+  { value: "12px", label: "12px" },
+  { value: "14px", label: "14px" },
+  { value: "16px", label: "16px" },
+  { value: "18px", label: "18px" },
+  { value: "20px", label: "20px" },
+  { value: "24px", label: "24px" },
+  { value: "28px", label: "28px" },
+  { value: "32px", label: "32px" },
+  { value: "36px", label: "36px" },
+
+];
 
 export const MenuBar = ({ editor }: MenuBarProps) => {
   if (!editor) return null;
@@ -89,6 +113,11 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
     editor.chain().focus().setNode('paragraph', { lineHeight: lineHeight }).run()
   }
 
+  function setFontSize(fontSize: string) {
+
+    editor?.chain().focus().setMark('textStyle', { fontSize: fontSize }).run()
+  }
+
   function toggleFontTypeSelectionOpen() {
     fontSelectOpen ? setFontSelectOpen(false) : setFontSelectOpen(true)
   }
@@ -97,7 +126,7 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
     lineHeightSelectOpen ? setLineHeightSelectOpen(false) : setLineHeightSelectOpen(true)
   }
 
-  function toggleFontFontSizeSelectionOpen() {
+  function toggleFontSizeSelectionOpen() {
     fontSizeSelectOpen ? setFontSizeSelectOpen(false) : setFontSizeSelectOpen(true)
   }
 
@@ -191,14 +220,6 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
 
       <Divider />
 
-      {/* <select onChange={(e) => editor.commands.setRating(Number(e.target.value))}>
-        <option value="1">1 ★</option>
-        <option value="2">2 ★★</option>
-        <option value="3">3 ★★★</option>
-        <option value="4">4 ★★★★</option>
-        <option value="5">5 ★★★★★</option>
-      </select> */}
-
       <button
         type="button"
         onClick={() => setIconPickerOpen(true)}
@@ -228,13 +249,40 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
         <FileTypeCorner size={iconButtonSize} />
       </div>
 
-      {fontSelectOpen ? <select onChange={(e) => setFont(e.target.value)}>
+      {/*  {fontSelectOpen ? <select onChange={(e) => setFont(e.target.value)}>
         <option value="Arial">Arial</option>
         <option value="Georgia">Georgia</option>
         <option value="Roboto">Roboto</option>
-      </select> : ''}
+      </select> : ''} */}
 
 
+      {fontSelectOpen &&
+
+        <div
+          className="fixed top-[120px] left-[500px] 
+         p-4 bg-primaryBackgroundColor text-primaryTextColor 
+         max-h-[60vh] overflow-y-auto"
+        >
+          Linjehøjde
+          <div className="p-4 bg-primaryBackgroundColor text-secondaryTextColor max-h-[60vh]  border-4 border-white overflow-y-auto">
+            {fonts.map(option => (
+              <div
+                className="m-5 bg-thirdBackgroundColor  border-2 border-white overflow-y-auto  rounded-lg"
+                key={option.value}
+                onClick={() => {
+                  setFont(option.value)
+                  toggleFontTypeSelectionOpen()
+                }}
+                style={{
+                  padding: "6px 10px",
+                  cursor: "pointer",
+                }}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>
+        </div>}
 
       <Divider />
 
@@ -242,40 +290,72 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
         <img src="/images/LineHeight.svg" alt="Logo" height={iconButtonSize} width={iconButtonSize} />
       </div>
 
-      {lineHeightSelectOpen ? <select onChange={(e) => setLineHeight(e.target.value)}>
-        <option value="1.0">1.0</option>
-        <option value="1.5">1.5</option>
-        <option value="2.0">2.0</option>
-        <option value="3.0">3.0</option>
-        <option value="4.0">4.0</option>
-      </select> : ''}
+      {lineHeightSelectOpen &&
+
+        <div
+          className="fixed top-[120px] left-[500px] 
+         p-4 bg-primaryBackgroundColor text-primaryTextColor 
+         max-h-[60vh] overflow-y-auto"
+        >
+          Linjehøjde
+          <div className="p-4 bg-primaryBackgroundColor text-secondaryTextColor max-h-[60vh]  border-4 border-white overflow-y-auto">
+            {lineHeightoptions.map(option => (
+              <div
+                className="m-5 bg-thirdBackgroundColor  border-2 border-white overflow-y-auto  rounded-lg"
+                key={option.value}
+                onClick={() => {
+                  setLineHeight(option.value)
+                  toggleFontLineHeightSelectionOpen()
+                }}
+                style={{
+                  padding: "6px 10px",
+                  cursor: "pointer",
+                }}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>
+        </div>}
 
 
       <Divider />
 
-      <div onClick={toggleFontFontSizeSelectionOpen}>
-        <img src="/images/FontSize.svg" alt="Logo" height={iconButtonSize} width={iconButtonSize} />
+      <div onClick={toggleFontSizeSelectionOpen}>
+        <img
+          src="/images/FontSize.svg"
+          height={iconButtonSize}
+          width={iconButtonSize}
+          alt="Font-størrelse"
+        />
       </div>
-      {fontSizeSelectOpen ?
-        <select
-          className="rounded border px-1 text-sm"
-          value={editor?.getAttributes('textStyle').fontSize ?? ''}
-          onChange={e =>
-            editor
-              ?.chain()
-              .focus()
-              .setMark('textStyle', { fontSize: e.target.value })
-              .run()
-          }
-        >
-          <option value="">Size</option>
 
-          {sizes.map(size => (
-            <option key={size} value={size}>
-              {size.replace('px', '')}
-            </option>
-          ))}
-        </select> : ''}
+      {fontSizeSelectOpen &&
+        <div
+          className="fixed top-[120px] left-[100px] 
+         p-4 bg-primaryBackgroundColor text-primaryTextColor"
+        >
+          font-størrelse
+          <div className="p-4 bg-primaryBackgroundColor text-secondaryTextColor  border-4 border-white ">
+            {sizes.map(option => (
+              <div
+                className="m-5 bg-thirdBackgroundColor  border-2 border-white  rounded-lg"
+                key={option.value}
+                onClick={() => {
+                  setFontSize(option.value)
+                  toggleFontSizeSelectionOpen()
+                }}
+                style={{
+                  padding: "6px 10px",
+                  cursor: "pointer",
+                }}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>
+        </div>
+      }
 
       <Divider />
 
