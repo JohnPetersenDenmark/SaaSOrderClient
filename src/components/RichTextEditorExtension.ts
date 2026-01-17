@@ -14,19 +14,15 @@ import Image from '@tiptap/extension-image'
 import { Rating } from "./Rating";
 import { RatingUserSelection } from "./RatingUserSelection";
 import { SvgIconTipTapExtension } from "./SvgIconTipTapExtension";
-import { IndentableParagraph } from "./IndentableParagraph";
-
-
-import ParagraphWithLineHeight from "./ParagraphWithLineHeight";
-
+import ParagraphWithLineHeightAndIndent from "../ParagraphWithLineHeightAndIndent";
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
+import Subscript from '@tiptap/extension-subscript'
+import Superscript from '@tiptap/extension-superscript'
 
 export const tiptapExtensions = [
-  StarterKit.configure({
-    bulletList: false,
-    orderedList: false,
-    paragraph: false,
+  StarterKit.configure({   
+    //  paragraph: false,
   }),
 
   TextStyle, // ✅ named export
@@ -35,14 +31,15 @@ export const tiptapExtensions = [
   TaskItem,
   Checkmark,
   RawHTML,
+  Subscript,
+  Superscript,
   Rating,
   RatingUserSelection,
-  SvgIconTipTapExtension,
-  IndentableParagraph,
+   SvgIconTipTapExtension,
+   ParagraphWithLineHeightAndIndent,
   Color,
   Image,
-  FontSize,
-  ParagraphWithLineHeight,
+  FontSize,  
   BulletList,
   OrderedList,
   ListItem,

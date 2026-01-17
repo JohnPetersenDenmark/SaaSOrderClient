@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import { MenuBar } from "./admin/MenuBar";
 
 interface RichTextEditorProps {
-  value: string;
+  value: string; 
   onChange: (html: string) => void;
   readOnly?: boolean;
 }

@@ -4,6 +4,8 @@ import { useState } from "react";
 import type { htmlBit } from "./ModalSelectHTMLbits";
 import { UnicodeIconPicker } from "../UnicodeIconPicker";
 import { FileCodeCorner, FileTypeCorner, ALargeSmall } from "lucide-react";
+import type { CommandProps } from '@tiptap/core'
+import baseUrl from "../../config";
 
 import {
   Bold,
@@ -76,25 +78,45 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
   const increaseIndent = (editor: any) => {
     if (!editor) return
 
-    const current = editor.getAttributes('paragraph').indent ?? 0
+     editor.chain().focus().command( ({ state, tr }: CommandProps) => {
+        const { from, to } = state.selection
 
-    editor
-      .chain()
-      .updateAttributes('paragraph', { indent: current + 1 })
-      .focus()
-      .run()
+        state.doc.nodesBetween(from, to, (node, pos) => {
+          if (node.type.name === 'paragraph') {
+            const indent = node.attrs.indent ?? 0
+
+            tr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              indent: indent + 10,
+            })
+          }
+        })
+
+        return true
+      }
+    ).run()
   }
 
   const decreaseIndent = (editor: any) => {
     if (!editor) return
 
-    const current = editor.getAttributes('paragraph').indent ?? 0
+    editor.chain().focus().command( ({ state, tr }: CommandProps) => {
+        const { from, to } = state.selection
 
-    editor
-      .chain()
-      .updateAttributes('paragraph', { indent: Math.max(0, current - 1) })
-      .focus()
-      .run()
+        state.doc.nodesBetween(from, to, (node, pos) => {
+          if (node.type.name === 'paragraph') {
+            const indent = node.attrs.indent ?? 0
+
+            tr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              indent: indent -10,
+            })
+          }
+        })
+
+        return true
+      }
+    ).run()
   }
 
   const resetStyles = () => {
@@ -109,8 +131,24 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
     return;
   }
 
-  function setLineHeight(lineHeight: string) {
-    editor.chain().focus().setNode('paragraph', { lineHeight: lineHeight }).run()
+  function setLineHeight(selectedLineHeight: string) {
+     editor.chain().focus().command( ({ state, tr }: CommandProps) => {
+        const { from, to } = state.selection
+
+        state.doc.nodesBetween(from, to, (node, pos) => {
+          if (node.type.name === 'paragraph') {
+            const lineHeight = node.attrs.lineHeight ?? 0
+
+            tr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              lineHeight: selectedLineHeight
+            })
+          }
+        })
+
+        return true
+      }
+    ).run()
   }
 
   function setFontSize(fontSize: string) {
@@ -220,6 +258,21 @@ export const MenuBar = ({ editor }: MenuBarProps) => {
 
       <Divider />
 
+      <button
+        onClick={() => editor.chain().focus().toggleSubscript().run()}
+        className={editor.isActive('subscript') ? 'active' : ''}
+      >
+         <img src='/images/subscript.svg' alt="Logo" height={iconButtonSize} width={iconButtonSize} />
+      </button>
+ <Divider />
+      <button
+        onClick={() => editor.chain().focus().toggleSuperscript().run()}
+        className={editor.isActive('subscript') ? 'active' : ''}
+      >
+         <img src= '/images/superscript.svg'alt="Logo" height={iconButtonSize} width={iconButtonSize} />       
+      </button>
+
+ <Divider />
       <button
         type="button"
         onClick={() => setIconPickerOpen(true)}
