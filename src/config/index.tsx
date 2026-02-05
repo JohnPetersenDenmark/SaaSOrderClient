@@ -7,9 +7,11 @@ import type { TenantConfig } from "./types";
 export const getConfig = (): TenantConfig => {
   const host = window.location.hostname;
 
-  if (host.includes("localhost")) return JJfisk;
+ /*  if (host.includes("localhost") || host.includes("www.dotnetdev.dk")) return JJfisk;
 
-  return Default;
+  return Default; */
+
+  return JJfisk
 };
 
 const ConfigContext = createContext<{ config: TenantConfig }>({ config: getConfig() });

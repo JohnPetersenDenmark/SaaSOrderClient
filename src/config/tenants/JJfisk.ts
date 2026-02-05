@@ -5,8 +5,8 @@ const JJfisk: TenantConfig = {
   id: "JJfisk",
   name: "JJfisk ApS",
 
-  apiBaseUrl: "http://192.168.1.58:5000",
-  //apiBaseUrl: "http://www.dotnetdev.dk",
+ // apiBaseUrl: "http://192.168.1.58:5000",
+  apiBaseUrl: "http://www.dotnetdev.dk",
 
 
   theme: {
@@ -30,7 +30,7 @@ const JJfisk: TenantConfig = {
     heroSubtitle1: "VI KØRER I HELE MIDTJYLLAND",
     heroSubtitle2: "Friske fisk i Aarhus og Midtjylland",
     heroSubtitle3: " J Fisk holder til i Hasselager, hvor vi producerer alle vores varer og pakker vores fiskebiler op hver morgen. I kan her på siden se i hvilket område de 6 mobile fiskevogne holder til. I kan følge os på Facebook eller kontakte bilerne direkte i åbningstiden.",
-    heroSubtitle4: " Her finder du vores 6 mobile fiskeforretninger",
+    heroSubtitle4: " Her finder du vores 5 mobile fiskeforretninger",
     cta: "",
   },
 

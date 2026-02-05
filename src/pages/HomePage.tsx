@@ -13,6 +13,10 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
+  let tmp = config.apiBaseUrl;
+  let tmp1 = config;
+  let y = tmp1;
+
   function handleSelectedFishShop(fishShop: FishShopFullDto, templateScedule: TemplateSchedule) {
 
     navigate("/createOrder", { state: { fishShop, templateScedule } });
