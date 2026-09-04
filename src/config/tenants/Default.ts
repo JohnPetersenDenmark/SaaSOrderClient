@@ -4,7 +4,7 @@ const Default: TenantConfig = {
  id: "Default",
   name: "Default ApS",
 
-     apiBaseUrl: "http://192.168.1.52:5000",
+     apiBaseUrl: "http://192.168.1.17:5000",
 
 
   theme: {

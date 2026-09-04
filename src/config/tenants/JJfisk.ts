@@ -5,8 +5,8 @@ const JJfisk: TenantConfig = {
   id: "JJfisk",
   name: "JJfisk ApS",
 
- // apiBaseUrl: "http://192.168.1.58:5000",
-  apiBaseUrl: "http://www.dotnetdev.dk",
+  apiBaseUrl: "http://192.168.1.17:5000",
+  //apiBaseUrl: "http://www.dotnetdev.dk",
 
 
   theme: {
